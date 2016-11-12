@@ -2,12 +2,10 @@
 #for a dplyr sqlite tutorial: https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html
 #to download required data files: https://www.dropbox.com/sh/ojjasinnk17mi0m/AAAJtygVHup26jDH9Y8_bTvha?dl=0
 library(tidyverse); library(RSQLite)
-#is this code being run on macOS? this will automate directory when Tristan runs code
-macOS <- grepl("apple", sessionInfo()$platform)
 
-#reset directory to folder containing folder containing .Rproj file
 original_wd <- getwd()
-if(macOS){new_wd <- gsub("/programs", "", getwd())} #else {new_wd <- gsub("\programs", "", getwd())}
+#reset directory to folder containing folder containing .Rproj file
+new_wd <- gsub("programs", "", getwd())
 setwd(new_wd)
 
 #if database does not exist, create it
@@ -16,8 +14,7 @@ my_db <- src_sqlite("finding_trump.db", create = create)
 tables <- src_tbls(my_db)
 
 #reset directory to data folder
-if(macOS){new_wd <- paste0(new_wd, "/data")} #else {new_wd <- paste0(new_wd, "\data")}
-setwd(new_wd)
+setwd(paste0(new_wd, "data"))
 
 #2001
 #if the csv is available and the ACS_2001 table does not exist
