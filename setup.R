@@ -1,12 +1,20 @@
 #place /programs in same directory along with a /data folder 
 #for a dplyr sqlite tutorial: https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html
 #to download required data files: https://www.dropbox.com/sh/ojjasinnk17mi0m/AAAJtygVHup26jDH9Y8_bTvha?dl=0
-library(tidyverse); library(RSQLite)
+library(tidyverse)
 
 original_wd <- getwd()
 #reset directory to folder containing folder containing .Rproj file
 new_wd <- gsub("programs", "", getwd())
 setwd(new_wd)
+
+#if data folder does not exist or there are no files in the data folder
+if(!("data" %in% list.files()) | length(list.files("data")) == 0){
+  print("FILL data FOLDER WITH FILES FROM DROPBOX TO CREATE SQLite TABLES")
+  dir.create("data")
+  print("you will have to break and add files to disable wait period")
+  print(paste("waiting", 99^99, "seconds"))
+  Sys.sleep(99^99)}
 
 #if database does not exist, create it
 create <- !("finding_trump.db" %in% list.files())
