@@ -12,8 +12,10 @@ finding_trump.db
 
 .Rhistory
 
-# exclude everything
+# exclude everything in data folder
 data/*
 
 # exception to the rule
-!data/readme.txt
+!data/doNotDelete.txt
+
+.db
