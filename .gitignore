@@ -11,3 +11,9 @@ finding_trump.db
 .Rproj.user
 
 .Rhistory
+
+# exclude everything
+data/*
+
+# exception to the rule
+!data/readme.txt
