@@ -3,13 +3,8 @@
 #to download required data files: https://www.dropbox.com/sh/ojjasinnk17mi0m/AAAJtygVHup26jDH9Y8_bTvha?dl=0
 library(tidyverse)
 
-original_wd <- getwd()
-#reset directory to folder containing folder containing .Rproj file
-new_wd <- gsub("programs", "", getwd())
-setwd(new_wd)
-
 #if data folder does not exist or there are no files in the data folder
-if(!("data" %in% list.files()) | length(list.files("data")) == 0){
+if(length(list.files("data")) <= 1){
   print("FILL data FOLDER WITH FILES FROM DROPBOX TO CREATE SQLite TABLES")
   dir.create("data")
   print("you will have to break and add files to disable wait period")
@@ -22,12 +17,11 @@ my_db <- src_sqlite("finding_trump.db", create = create)
 tables <- src_tbls(my_db)
 
 #reset directory to data folder
-setwd(paste0(new_wd, "data"))
 
 #2001
 #if the csv is available and the ACS_2001 table does not exist
-if("usa_00002.csv" %in% list.files() & !("ACS_2001" %in% tables)){
-  read_csv("usa_00002.csv",
+if("usa_00002.csv" %in% list.files("data") & !("ACS_2001" %in% tables)){
+  read_csv("data/usa_00002.csv",
            #do not read 2015 rows
            n_max = 1192206) %>%
     #select columns where values are not 100% missing
@@ -38,7 +32,7 @@ if("usa_00002.csv" %in% list.files() & !("ACS_2001" %in% tables)){
 
 #2015
 #if the csv is available and the ACS_2015 table does not exist
-if("usa_00002.csv" %in% list.files() & !("ACS_2015" %in% tables)){
+if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
 read_csv("usa_00002.csv",
          #skip 2001 rows
          skip = 1192207,
