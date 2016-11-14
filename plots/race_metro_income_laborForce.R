@@ -1,5 +1,4 @@
-# TK Test
-
+# TK Test - Deleted the extra line and added this sentence.
 library(tidyverse)
 my_db <- src_sqlite("finding_trump.db", create = F)
 
