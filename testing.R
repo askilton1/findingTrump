@@ -86,11 +86,17 @@ test2 %>%
          LABFORCE_not_white = ifelse(RACWHT == "not White", LABFORCE, 0),
          LABFORCE_not_white = max(LABFORCE_not_white)) %>% 
   ggplot() +
-  geom_segment(aes(x = HHINCOME_white, xend = HHINCOME_not_white, y = LABFORCE_white, yend = LABFORCE_not_white), size = .1) +
-  geom_point(aes(x = HHINCOME, y = LABFORCE, size = n, color = RACWHT, alpha = 0.5)) +
-  facet_wrap(~ METRO, scales = "free") + 
-  theme_minimal() + 
-  xlab("Household Income") + 
-  ylab("Percent in Labor Force")
+    geom_segment(aes(x = HHINCOME_white, xend = HHINCOME_not_white, y = LABFORCE_white, yend = LABFORCE_not_white), size = .1) +
+    geom_point(aes(x = HHINCOME, y = LABFORCE, size = n, color = RACWHT, alpha = 0.5)) +
+    facet_wrap(~ METRO, scales = "free") + 
+    theme_minimal() + 
+    xlab("Household Income") + 
+    ylab("Percent in Labor Force") + 
+    scale_size(guide = FALSE) + 
+    scale_alpha(guide = FALSE) +
+    scale_color_manual(name = "Race",
+                       #colors from: http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
+                       values = c("#000000", "#D55E00")) +
+    ggtitle("In Most States Whites Are Much Better Off Than Non Whites")
 
 
