@@ -11,4 +11,16 @@ finding_trump.db
 .Rproj.user
 
 .Rhistory
+<<<<<<< HEAD
+=======
+
+# exclude everything in data folder
+data/*
+
+# exception to the rule
+!data/doNotDelete.txt
+
+.db
+
+>>>>>>> origin/master
 *.csv
