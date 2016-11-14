@@ -97,6 +97,7 @@ test2 %>%
     scale_color_manual(name = "Race",
                        #colors from: http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
                        values = c("#000000", "#D55E00")) +
-    ggtitle("In Most States Whites Are Much Better Off Than Non Whites")
+    ggtitle("In Most States Whites Are Much Better Off Than Non Whites") + 
+    theme(legend.position = "bottom")
 
 
