@@ -17,7 +17,7 @@ tbl(my_db, sql("select distinct COUNTYFIPS from ACS_2015")) %>%
 ##1: not in metro area
 ##2: In metro area, central/principal city
 ##3: In metro area, outside central/principal city
-##4: In metro area, outside centra/principal city
+##4: Central/Principal city status unknown
 
 #POVERTY
 ## 000 = N/A
@@ -67,10 +67,10 @@ test %>%
          STATEFIP = ifelse(STATEFIP >= 4, STATEFIP - 1, STATEFIP),
          #map abbreviation
          STATEFIP = plyr::mapvalues(STATEFIP, 1:51, c(state.abb[1:10], "DC", state.abb[11:50])),
-         METRO = plyr::mapvalues(METRO, 1:4, c("not in metro area", 
+         METRO = plyr::mapvalues(METRO, 1:4, c("Not in metro area", 
                                                "In metro area, central/principal city",
                                                "In metro area, outside central/principal city",
-                                               "In metro area, outside centra/principal city")),
+                                               "Central/Principal city status unknown")),
          RACWHT = as.factor(plyr::mapvalues(RACWHT, 0:1, c("not White", "White")))
   ) -> test2
 
@@ -99,5 +99,4 @@ test2 %>%
                        values = c("#000000", "#D55E00")) +
     ggtitle("In Most States Whites Are Much Better Off Than Non Whites") + 
     theme(legend.position = "bottom")
-
-
+ggsave("plots/output/whites_better_off_by_region_type.pdf")
