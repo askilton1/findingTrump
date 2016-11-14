@@ -1,23 +1,12 @@
+# TK Test - Deleted the extra line and added this sentence.
 library(tidyverse)
 my_db <- src_sqlite("finding_trump.db", create = F)
-my_db
-
-tbl(my_db, sql("select poverty from ACS_2015 limit 5")) %>%
-  collect %>%
-  names
-
-#calculate number of counties using SQLite query
-tbl(my_db, sql("select count(distinct COUNTYFIPS) from ACS_2015"))
-
-#calculate number of counties using R. this is faster
-tbl(my_db, sql("select distinct COUNTYFIPS from ACS_2015")) %>%
-  collect
 
 #METRO:
 ##1: not in metro area
 ##2: In metro area, central/principal city
 ##3: In metro area, outside central/principal city
-##4: In metro area, outside centra/principal city
+##4: Central/Principal city status unknown
 
 #POVERTY
 ## 000 = N/A
@@ -33,6 +22,7 @@ tbl(my_db, sql("select distinct COUNTYFIPS from ACS_2015")) %>%
 ##1: No, not in the labor force
 ##2: Yes, in the labor force
 
+# STRUCTURE SQL QUERY USING DPLYR
 tbl(my_db, sql("select * from ACS_2015")) %>%
   select(STATEFIP, METRO, HHINCOME, POVERTY, RACWHT, LABFORCE) %>%
   filter(METRO != 0,
@@ -48,18 +38,13 @@ tbl(my_db, sql("select * from ACS_2015")) %>%
             LABFORCE = mean(LABFORCE),
             n = n()) %>%
   ungroup %>%
-  collect -> test
-
-#METRO:
-##1: not in metro area
-##2: In metro area, central/principal city
-##3: In metro area, outside central/principal city
-##4: In metro area, outside centra/principal city
-
-test %>%
-  arrange(POVERTY) %>%
-  round(., 2) %>%
-  #need to fill in gaps in STATEFIP
+  
+  #EXTRACT DATA FROM DATABASE USING collect()
+  
+  collect %>%
+  
+  #CLEAN DATA EXTRACTED FROM DATABASE
+  ###need to fill in gaps in STATEFIP
   mutate(STATEFIP = ifelse(STATEFIP >= 53, STATEFIP - 1, STATEFIP),
          STATEFIP = ifelse(STATEFIP >= 44, STATEFIP - 1, STATEFIP),
          STATEFIP = ifelse(STATEFIP >= 15, STATEFIP - 1, STATEFIP),
@@ -67,14 +52,15 @@ test %>%
          STATEFIP = ifelse(STATEFIP >= 4, STATEFIP - 1, STATEFIP),
          #map abbreviation
          STATEFIP = plyr::mapvalues(STATEFIP, 1:51, c(state.abb[1:10], "DC", state.abb[11:50])),
-         METRO = plyr::mapvalues(METRO, 1:4, c("not in metro area", 
+         METRO = plyr::mapvalues(METRO, 1:4, c("Not in metro area", 
                                                "In metro area, central/principal city",
                                                "In metro area, outside central/principal city",
-                                               "In metro area, outside centra/principal city")),
+                                               "Central/Principal city status unknown")),
          RACWHT = as.factor(plyr::mapvalues(RACWHT, 0:1, c("not White", "White")))
-  ) -> test2
-
-test2 %>%
+  ) %>%
+  
+  #MANIPULATE DATA FOR SPECIFIC GRAPH
+  
   arrange(STATEFIP, METRO) %>%
   group_by(STATEFIP, METRO) %>%
   mutate(HHINCOME_white = ifelse(RACWHT == "White", HHINCOME, 0),
@@ -99,5 +85,4 @@ test2 %>%
                        values = c("#000000", "#D55E00")) +
     ggtitle("In Most States Whites Are Much Better Off Than Non Whites") + 
     theme(legend.position = "bottom")
-
-
+ggsave("plots/output/whites_better_off_by_region_type.pdf")
