@@ -1,6 +1,7 @@
 #place /programs in same directory along with a /data folder 
 #for a dplyr sqlite tutorial: https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html
 #to download required data files: https://www.dropbox.com/sh/ojjasinnk17mi0m/AAAJtygVHup26jDH9Y8_bTvha?dl=0
+# Test - TK
 library(tidyverse)
 
 original_wd <- getwd()
@@ -22,7 +23,8 @@ my_db <- src_sqlite("finding_trump.db", create = create)
 tables <- src_tbls(my_db)
 
 #reset directory to data folder
-setwd(paste0(new_wd, "data"))
+# Windows users use "/data"
+setwd(paste0(new_wd, "/data"))
 
 #2001
 #if the csv is available and the ACS_2001 table does not exist
