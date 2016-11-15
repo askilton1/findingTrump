@@ -33,7 +33,7 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2001" %in% tables)){
 #2015
 #if the csv is available and the ACS_2015 table does not exist
 if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
-  read_csv("usa_00002.csv",
+  read_csv("data/usa_00002.csv",
            #skip 2001 rows
            skip = 1192207,
            #can't figure out how to both skip rows and retain header
@@ -44,5 +44,12 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
     copy_to(dest = my_db, df = ., name = "ACS_2015", temporary = F)
 }
 
+#FDIC 2009-2015 AFS Census Supplement
+#if the csv is available and the ACS_2015 table does not exist
+if("Built_FDIC_2009_2015.csv" %in% list.files("data") & !("AFS_2009_2015" %in% tables)){
+  read_csv("data/Built_FDIC_2009_2015.csv") %>%
+    #create a new table in database
+    copy_to(dest = my_db, df = ., name = "AFS_2009_2015", temporary = F)
+}
 #reset working directory in case you want to run program again
 setwd(original_wd)
