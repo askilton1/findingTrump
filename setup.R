@@ -33,7 +33,7 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2001" %in% tables)){
 #2015
 #if the csv is available and the ACS_2015 table does not exist
 if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
-  read_csv("usa_00002.csv",
+  read_csv("data/usa_00002.csv",
            #skip 2001 rows
            skip = 1192207,
            #can't figure out how to both skip rows and retain header
