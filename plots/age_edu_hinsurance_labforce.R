@@ -1,4 +1,3 @@
-# TK Test - Deleted the extra line and added this sentence.
 library(tidyverse)
 my_db <- src_sqlite("finding_trump.db", create = F)
 
@@ -16,8 +15,6 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 #RACWHT
 ## 1: No
 ## 2: Yes
-
-
 
 # STRUCTURE SQL QUERY USING DPLYR
 # AGE
@@ -45,48 +42,39 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 ##10 4 years of college
 ##11 5+ years of college
 
-
 # STRUCTURE SQL QUERY USING DPLYR
+# Capped income at 500,000
 tbl(my_db, sql("select * from ACS_2015")) %>%
-  select(AGE, LABFORCE, HCOVANY, EDUC, HHINCOME) %>%
-  filter(AGE >= 018,
-         LABFORCE != 0,
-         EDUC != 0) %>%
-  mutate(LABFORCE = LABFORCE - 1,
-         HCOVANY = HCOVANY -1) %>%
-  summarise(HCOVANY = mean(HCOVANY),
-            HHINCOME = median(HHINCOME)) %>%
+  select(AGE, HHINCOME, EDUC) %>%
+  filter(AGE >= 18,
+         HHINCOME < 250000) %>%
+ mutate(EDUC = ifelse(EDUC >= 7, 3, 
+                ifelse(EDUC <7 & EDUC >= 5, 2,
+                      ifelse(EDUC < 5 & EDUC >= 3, 1,
+                              ifelse(EDUC < 3, 0, 0))))) %>%
 
-  #EXTRACT DATA FROM DATABASE USING collect()
-  
+    #EXTRACT DATA FROM DATABASE USING collect()
   collect %>%
-  
-  #CLEAN DATA EXTRACTED FROM DATABASE
+    #CLEAN DATA EXTRACTED FROM DATABASE
   mutate(#map abbreviation
-    EDUC = ifelse(EDUC >= 07, 3, EDUC),
-    EDUC = ifelse(EDUC >= 05 & EDUC < 07, 2, EDUC),
-    EDUC = ifelse(EDUC >= 03 & EDUC < 05, 1, EDUC),
-    EDUC = ifelse(EDUC < 03, 0, EDUC),
-    EDUC = plyr::mapvalues(EDUC, 0:3, c("Less than middle school education",
+   EDUC = plyr::mapvalues(EDUC, 0:3, c("Less than middle school education",
                                         "Some high school education",
                                         "High school education",
-                                        "College education")),
-    HCOVANY = plyr::mapvalues(HCOVANY, 0:1, c("No health insurance coverage", 
-                                               "With health insurance coverage"))
-  ) %>%
+                                        "College education"))
+ ) %>%
   
   #MANIPULATE DATA FOR SPECIFIC GRAPH
-  
   arrange(EDUC) %>%
   group_by(EDUC) %>%
    ggplot() +
-    geom_point(aes(x = HHINCOME, y = HCOVANY, size = n, alpha = 0.5)) +
+    geom_smooth(aes(x = AGE , y = HHINCOME)) +
+  scale_size(guide = FALSE) + 
+  scale_alpha(guide = FALSE) +
     facet_wrap(~ EDUC, scales = "free") + 
     theme_minimal() + 
-    xlab("Household Income") + 
-    ylab("Percent with Health Insurance") + 
-    scale_size(guide = FALSE) + 
-    scale_alpha(guide = FALSE) +
-#    ggtitle("In Most States Whites Are Much Better Off Than Non Whites") + 
+    xlab("Age") + 
+    ylab("Household Income")
+  #  scale_size(guide = FALSE) + 
+  #  scale_alpha(guide = FALSE) +
+    ggtitle("Household Income by Age, by Education") + 
     theme(legend.position = "bottom")
-#gsave("plots/output/whites_better_off_by_region_type.pdf")
