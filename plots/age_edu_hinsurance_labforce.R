@@ -54,7 +54,8 @@ tbl(my_db, sql("select * from ACS_2015")) %>%
                               ifelse(EDUC < 3, 0, 0))))) %>%
 
     #EXTRACT DATA FROM DATABASE USING collect()
-  collect %>%
+  collect(., n = Inf) -> temp
+
     #CLEAN DATA EXTRACTED FROM DATABASE
   mutate(#map abbreviation
    EDUC = plyr::mapvalues(EDUC, 0:3, c("Less than middle school education",
@@ -63,6 +64,7 @@ tbl(my_db, sql("select * from ACS_2015")) %>%
                                         "College education"))
  ) %>%
   
+temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
   arrange(EDUC) %>%
   group_by(EDUC) %>%
