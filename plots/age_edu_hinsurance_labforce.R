@@ -76,6 +76,7 @@ temp %>%
     geom_smooth(aes(x = AGE , y = HHINCOME)) +
   scale_size(guide = FALSE) + 
   scale_alpha(guide = FALSE) +
+   ggplot(aes(x = AGE , y = HHINCOME / 1000)) +
     facet_wrap(~ EDUC, scales = "free") + 
     theme_minimal() + 
     xlab("Age") + 
