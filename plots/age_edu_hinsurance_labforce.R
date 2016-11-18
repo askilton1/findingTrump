@@ -44,34 +44,24 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 
 # STRUCTURE SQL QUERY USING DPLYR
 # Capped income at 250,000
-tbl(my_db, sql("select * from ACS_2015")) %>%
-  select(SERIAL, AGE, HHINCOME, EDUC) %>%
-  #EXTRACT DATA FROM DATABASE USING collect()
-  collect(., n = Inf) -> temp
-
-#by saving file we don't have to wait for each query to complete
-# save(temp, file = "image/aehl_table.RData")
-# load("image/aehl_table.RData")
-
-temp %>%
-  group_by(SERIAL) %>%
-  mutate(EDUC_max = max(EDUC)) %>%
+tbl(my_db, sql("select a.SERIAL, a.AGE, a.HHINCOME, b.HHEDUC 
+                from ACS_2015 a
+                left outer join (
+                  select SERIAL, max(EDUC) as HHEDUC
+                  from ACS_2015 
+                  group by SERIAL) b
+                  on a.SERIAL = b.SERIAL")) %>%
+  filter(HHINCOME < 2000000) %>%
          #3: some college or more
-  mutate(EDUC_max = ifelse(EDUC_max >= 7, 3,
+  mutate(HHEDUC = ifelse(HHEDUC >= 7, 3,
                        #2: grades 11 and 12
-                       ifelse(EDUC_max < 7 & EDUC_max >= 5, 2,
+                       ifelse(HHEDUC < 7 & HHEDUC >= 5, 2,
                               #1: grades 10, 9
-                              ifelse(EDUC_max < 5 & EDUC_max >= 3, 1,
+                              ifelse(HHEDUC < 5 & HHEDUC >= 3, 1,
                                      #0: grade 9 and below
-                                     ifelse(EDUC_max < 3, 0, 0))))) %>%
-
-  #CLEAN DATA EXTRACTED FROM DATABASE
-  mutate(#map abbreviation
-    EDUC_max = plyr::mapvalues(EDUC_max, 0:3, c("Middle school or less",
-                                                "Some high school education",
-                                                "High school education",
-                                                "College education"))) -> temp
-
+                                     ifelse(HHEDUC < 3, 0, 0))))) %>%
+  #EXTRACT DATA FROM DATABASE USING collect()
+  collect(., n = Inf) -> temp 
 
 #do these outcomes match the way you've grouped education levels above?
 #most common groupings are: less than HSD, HSD, Some College, Bachelors, More than Bachelors
