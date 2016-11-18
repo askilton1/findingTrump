@@ -43,17 +43,19 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 ##11 5+ years of college
 
 # STRUCTURE SQL QUERY USING DPLYR
-# Capped income at 500,000
+# Capped income at 250,000
 tbl(my_db, sql("select * from ACS_2015")) %>%
-  select(AGE, HHINCOME, EDUC) %>%
-  filter(AGE >= 18,
-         HHINCOME < 250000) %>%
- mutate(EDUC = ifelse(EDUC >= 7, 3, 
-                ifelse(EDUC <7 & EDUC >= 5, 2,
-                      ifelse(EDUC < 5 & EDUC >= 3, 1,
-                              ifelse(EDUC < 3, 0, 0))))) %>%
-
-    #EXTRACT DATA FROM DATABASE USING collect()
+  select(SERIAL, AGE, HHINCOME, EDUC) %>%
+         #3: some college or more
+  mutate(EDUC = ifelse(EDUC >= 7, 3,
+                       #2: grades 11 and 12
+                       ifelse(EDUC < 7 & EDUC >= 5, 2,
+                              #1: grades 10, 9
+                              ifelse(EDUC < 5 & EDUC >= 3, 1,
+                                     #0: grade 9 and below
+                                     ifelse(EDUC < 3, 0, 0))))) %>%
+  
+  #EXTRACT DATA FROM DATABASE USING collect()
   collect(., n = Inf) -> temp
 
 #by saving file we don't have to wait for each query to complete
