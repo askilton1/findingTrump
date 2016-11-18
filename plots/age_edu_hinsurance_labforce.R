@@ -46,15 +46,6 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 # Capped income at 250,000
 tbl(my_db, sql("select * from ACS_2015")) %>%
   select(SERIAL, AGE, HHINCOME, EDUC) %>%
-         #3: some college or more
-  mutate(EDUC = ifelse(EDUC >= 7, 3,
-                       #2: grades 11 and 12
-                       ifelse(EDUC < 7 & EDUC >= 5, 2,
-                              #1: grades 10, 9
-                              ifelse(EDUC < 5 & EDUC >= 3, 1,
-                                     #0: grade 9 and below
-                                     ifelse(EDUC < 3, 0, 0))))) %>%
-  
   #EXTRACT DATA FROM DATABASE USING collect()
   collect(., n = Inf) -> temp
 
@@ -64,6 +55,18 @@ save(temp, file = "image/aehl_table.RData")
 #CLEAN DATA EXTRACTED FROM DATABASE
 load("image/aehl_table.RData") 
 temp %>%
+  group_by(SERIAL) %>%
+  mutate(EDUC_max = max(EDUC)) %>%
+         #3: some college or more
+  mutate(EDUC_max = ifelse(EDUC_max >= 7, 3,
+                       #2: grades 11 and 12
+                       ifelse(EDUC_max < 7 & EDUC_max >= 5, 2,
+                              #1: grades 10, 9
+                              ifelse(EDUC_max < 5 & EDUC_max >= 3, 1,
+                                     #0: grade 9 and below
+                                     ifelse(EDUC_max < 3, 0, 0))))) %>%
+
+  #CLEAN DATA EXTRACTED FROM DATABASE
   mutate(#map abbreviation
     EDUC = plyr::mapvalues(EDUC, 0:3, c("Middle school or less",
                                         "Some high school education",
