@@ -70,6 +70,23 @@ temp %>%
                                         "High school education",
                                         "College education"))) -> temp
 
+
+#do these outcomes match the way you've grouped education levels above?
+#most common groupings are: less than HSD, HSD, Some College, Bachelors, More than Bachelors
+
+temp %>%
+  group_by(EDUC) %>%
+  summarise(n = n(), `median income` = median(HHINCOME)) %>%
+  ggplot(aes(x = as.factor(EDUC), y = `median income`, size = n)) + 
+    geom_point(stat = "identity")
+
+temp %>%
+  sample_n(100000) %>%
+  ggplot(aes(x = as.factor(EDUC), y = HHINCOME)) +
+    geom_boxplot()
+
+############################
+
 temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
   #arrange(EDUC) %>%
