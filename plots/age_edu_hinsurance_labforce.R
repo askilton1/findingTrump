@@ -79,6 +79,15 @@ temp %>%
 
 ############################
 
+
+#CLEAN DATA EXTRACTED FROM DATABASE
+temp %>%
+  mutate(#map abbreviation
+    HHEDUC = plyr::mapvalues(HHEDUC, 0:3, c("Middle school or less",
+                                          "Some high school education",
+                                          "High school education",
+                                          "College education"))) -> temp
+
 temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
   ggplot(aes(x = AGE , y = HHINCOME / 1000, color = HHEDUC)) +
