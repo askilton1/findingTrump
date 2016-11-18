@@ -91,16 +91,16 @@ temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
   #arrange(EDUC) %>%
   #group_by(EDUC) %>%
-   ggplot(aes(x = AGE , y = HHINCOME / 1000)) +
-    #geom_density() +
-    geom_smooth() +
-    scale_size(guide = FALSE) + 
-    scale_alpha(guide = FALSE) +
-    facet_wrap(~ EDUC, scales = "free") + 
-    theme_minimal() + 
-    xlab("Age") + 
-    ylab("Household Income")
-  #  scale_size(guide = FALSE) + 
-  #  scale_alpha(guide = FALSE) +
-    ggtitle("Household Income by Age, by Education") + 
-    theme(legend.position = "bottom")
+  ggplot(aes(x = AGE , y = HHINCOME / 1000)) +
+  #geom_density() +
+  geom_smooth() +
+  scale_size(guide = FALSE) + 
+  scale_alpha(guide = FALSE) +
+  facet_wrap(~ EDUC, scales = "free") + 
+  theme_minimal() + 
+  xlab("Age") + 
+  ylab("Household Income")
+#  scale_size(guide = FALSE) + 
+#  scale_alpha(guide = FALSE) +
+ggtitle("Household Income by Age, by Education") + 
+  theme(legend.position = "bottom")
