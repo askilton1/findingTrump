@@ -91,8 +91,6 @@ temp %>%
 
 temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
-  #arrange(EDUC) %>%
-  #group_by(EDUC) %>%
   ggplot(aes(x = AGE , y = HHINCOME / 1000)) +
   #geom_density() +
   geom_smooth() +
