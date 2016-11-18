@@ -50,10 +50,9 @@ tbl(my_db, sql("select * from ACS_2015")) %>%
   collect(., n = Inf) -> temp
 
 #by saving file we don't have to wait for each query to complete
-save(temp, file = "image/aehl_table.RData")
+# save(temp, file = "image/aehl_table.RData")
+# load("image/aehl_table.RData")
 
-#CLEAN DATA EXTRACTED FROM DATABASE
-load("image/aehl_table.RData") 
 temp %>%
   group_by(SERIAL) %>%
   mutate(EDUC_max = max(EDUC)) %>%
