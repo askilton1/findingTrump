@@ -61,7 +61,7 @@ tbl(my_db, sql("select * from ACS_2015")) %>%
 #by saving file we don't have to wait for each query to complete
 save(temp, file = "image/aehl_table.RData")
 
-    #CLEAN DATA EXTRACTED FROM DATABASE
+#CLEAN DATA EXTRACTED FROM DATABASE
 load("image/aehl_table.RData") 
 temp %>%
   mutate(#map abbreviation
