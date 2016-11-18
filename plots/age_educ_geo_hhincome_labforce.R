@@ -50,14 +50,6 @@ tbl(my_db, sql("select a.SERIAL, a.METRO, a.AGE, a.HHINCOME, a.EDUC, b.HHEDUC
                                  select SERIAL, max(EDUC) as HHEDUC
                                  from ACS_2015 
                                  group by SERIAL) b
-  #3: some college or more
-  mutate(HHEDUC = ifelse(HHEDUC >= 7, 3,
-                         #2: grades 11 and 12
-                         ifelse(HHEDUC < 7 & HHEDUC >= 5, 2,
-                                #1: grades 10, 9
-                                ifelse(HHEDUC < 5 & HHEDUC >= 3, 1,
-                                       #0: grade 9 and below
-                                       ifelse(HHEDUC < 3, 0, 0))))) %>%
                on a.SERIAL = b.SERIAL
                where HHINCOME < 2000000")) %>%
   #EXTRACT DATA FROM DATABASE USING collect()
@@ -83,10 +75,18 @@ temp %>%
 #CLEAN DATA EXTRACTED FROM DATABASE
 temp %>%
   mutate(#map abbreviation
-    HHEDUC = plyr::mapvalues(HHEDUC, 0:3, c("Middle school or less",
-                                            "Some high school education",
-                                            "High school education",
-                                            "College education"))) -> temp
+    HHEDUC = plyr::mapvalues(HHEDUC, 0:11, c("N/A or no schooling",
+                                             "Nursery school to grade 4",
+                                             "Grade 5, 6, 7, or 8",
+                                             "Grade 9",
+                                             "Grade 10",
+                                             "Grade 11",
+                                             "Grade 12",
+                                             "1 year of college",
+                                             "2 years of college",
+                                             "3 years of college",
+                                             "4 years of college",
+                                             "5+ years of college"))) -> temp
 
 temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
