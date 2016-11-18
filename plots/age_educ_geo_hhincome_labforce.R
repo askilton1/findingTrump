@@ -47,9 +47,9 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 tbl(my_db, sql("select a.SERIAL, a.AGE, a.HHINCOME, b.HHEDUC 
                from ACS_2015 a
                left outer join (
-               select SERIAL, max(EDUC) as HHEDUC
-               from ACS_2015 
-               group by SERIAL) b
+                                 select SERIAL, max(EDUC) as HHEDUC
+                                 from ACS_2015 
+                                 group by SERIAL) b
                on a.SERIAL = b.SERIAL")) %>%
   filter(HHINCOME < 2000000) %>%
   #3: some college or more
