@@ -67,24 +67,24 @@ temp %>%
 
   #CLEAN DATA EXTRACTED FROM DATABASE
   mutate(#map abbreviation
-    EDUC = plyr::mapvalues(EDUC, 0:3, c("Middle school or less",
-                                        "Some high school education",
-                                        "High school education",
-                                        "College education"))) -> temp
+    EDUC_max = plyr::mapvalues(EDUC_max, 0:3, c("Middle school or less",
+                                                "Some high school education",
+                                                "High school education",
+                                                "College education"))) -> temp
 
 
 #do these outcomes match the way you've grouped education levels above?
 #most common groupings are: less than HSD, HSD, Some College, Bachelors, More than Bachelors
 
 temp %>%
-  group_by(EDUC) %>%
+  group_by(EDUC_max) %>%
   summarise(n = n(), `median income` = median(HHINCOME)) %>%
-  ggplot(aes(x = as.factor(EDUC), y = `median income`, size = n)) + 
+  ggplot(aes(x = as.factor(EDUC_max), y = `median income`, size = n)) + 
     geom_point(stat = "identity")
 
 temp %>%
   sample_n(100000) %>%
-  ggplot(aes(x = as.factor(EDUC), y = HHINCOME)) +
+  ggplot(aes(x = as.factor(EDUC_max), y = HHINCOME)) +
     geom_boxplot()
 
 ############################
@@ -98,7 +98,7 @@ temp %>%
   geom_smooth() +
   scale_size(guide = FALSE) + 
   scale_alpha(guide = FALSE) +
-  facet_wrap(~ EDUC, scales = "free") + 
+  facet_wrap(~ EDUC_max, scales = "free") + 
   theme_minimal() + 
   xlab("Age") + 
   ylab("Household Income")
