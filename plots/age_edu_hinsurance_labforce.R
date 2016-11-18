@@ -65,7 +65,7 @@ save(temp, file = "image/aehl_table.RData")
 load("image/aehl_table.RData") 
 temp %>%
   mutate(#map abbreviation
-   EDUC = plyr::mapvalues(EDUC, 0:3, c("Less than middle school education",
+    EDUC = plyr::mapvalues(EDUC, 0:3, c("Middle school or less",
                                         "Some high school education",
                                         "High school education",
                                         "College education"))) -> temp
