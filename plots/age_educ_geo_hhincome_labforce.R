@@ -81,9 +81,12 @@ temp %>%
   mutate(#map abbreviation
     HHEDUC = plyr::mapvalues(HHEDUC, 1:11, EDUC_labels),
     METRO = plyr::mapvalues(METRO, 0:4, METRO_labels),
+    Child = ifelse(RELATE == 3 | RELATE == 4 | RELATE == 9, 1, 0),
+    Head = ifelse(RELATE == 1, 1, 0)) -> temp
 
 temp %>%
-  #MANIPULATE DATA FOR SPECIFIC GRAPH
+  filter(#(Child == 1 & AGE <= 50) | Child == 0,
+         RELATE == 1) %>%
   ggplot(aes(x = AGE , y = HHINCOME / 1000, color = HHEDUC)) +
   geom_smooth() +
   facet_wrap(~ HHEDUC, scales = "free") + 
