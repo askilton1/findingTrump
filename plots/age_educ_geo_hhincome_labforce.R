@@ -8,6 +8,12 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 ##3: In metro area, outside central/principal city
 ##4: Central/Principal city status unknown
 
+METRO_labels <- c("not identifiable",
+                  "not in metro area",
+                  "In metro area",
+                  "In metro area",
+                  "In metro area")
+
 #POVERTY
 ## 000 = N/A
 ## 001 = 1% or less of poverty threshold
@@ -88,6 +94,7 @@ temp %>%
                                              "3 years of college",
                                              "4 years of college",
                                              "5+ years of college"))) -> temp
+    METRO = plyr::mapvalues(METRO, 0:4, METRO_labels),
 
 temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
