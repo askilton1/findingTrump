@@ -72,7 +72,7 @@ tbl(my_db, sql("select a.SERIAL, a.METRO, a.RACE, a.SEX, a.AGE, a.RELATE, a.HHIN
                                  from ACS_2015 
                                  group by SERIAL) b
                on a.SERIAL = b.SERIAL
-               where HHINCOME < 2000000")) %>%
+               where HHINCOME < 2000000 and EDUC != 0")) %>%
   #EXTRACT DATA FROM DATABASE USING collect()
   collect(., n = Inf) -> temp 
 
