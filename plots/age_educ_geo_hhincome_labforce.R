@@ -2,6 +2,7 @@ library(tidyverse)
 my_db <- src_sqlite("finding_trump.db", create = F)
 
 #METRO:
+##0: not identifiable
 ##1: not in metro area
 ##2: In metro area, central/principal city
 ##3: In metro area, outside central/principal city
