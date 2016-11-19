@@ -76,23 +76,6 @@ tbl(my_db, sql("select a.SERIAL, a.METRO, a.AGE, a.HHINCOME, a.EDUC, b.HHEDUC
   #EXTRACT DATA FROM DATABASE USING collect()
   collect(., n = Inf) -> temp 
 
-#do these outcomes match the way you've grouped education levels above?
-#most common groupings are: less than HSD, HSD, Some College, Bachelors, More than Bachelors
-
-temp %>%
-  group_by(HHEDUC) %>%
-  summarise(n = n(), `median income` = median(HHINCOME)) %>%
-  ggplot(aes(x = as.factor(HHEDUC), y = `median income`, size = n)) + 
-  geom_point(stat = "identity")
-
-temp %>%
-  sample_n(100000) %>%
-  ggplot(aes(x = as.factor(HHEDUC), y = HHINCOME)) +
-  geom_boxplot()
-
-############################
-
-
 #CLEAN DATA EXTRACTED FROM DATABASE
 temp %>%
   mutate(#map abbreviation
