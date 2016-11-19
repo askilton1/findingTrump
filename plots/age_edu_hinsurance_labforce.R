@@ -43,38 +43,60 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 ##11 5+ years of college
 
 # STRUCTURE SQL QUERY USING DPLYR
-# Capped income at 500,000
-tbl(my_db, sql("select * from ACS_2015")) %>%
-  select(AGE, HHINCOME, EDUC) %>%
-  filter(AGE >= 18,
-         HHINCOME < 250000) %>%
- mutate(EDUC = ifelse(EDUC >= 7, 3, 
-                ifelse(EDUC <7 & EDUC >= 5, 2,
-                      ifelse(EDUC < 5 & EDUC >= 3, 1,
-                              ifelse(EDUC < 3, 0, 0))))) %>%
+# Capped income at 250,000
+tbl(my_db, sql("select a.SERIAL, a.AGE, a.HHINCOME, b.HHEDUC 
+                from ACS_2015 a
+                left outer join (
+                  select SERIAL, max(EDUC) as HHEDUC
+                  from ACS_2015 
+                  group by SERIAL) b
+                  on a.SERIAL = b.SERIAL")) %>%
+  filter(HHINCOME < 2000000) %>%
+         #3: some college or more
+  mutate(HHEDUC = ifelse(HHEDUC >= 7, 3,
+                       #2: grades 11 and 12
+                       ifelse(HHEDUC < 7 & HHEDUC >= 5, 2,
+                              #1: grades 10, 9
+                              ifelse(HHEDUC < 5 & HHEDUC >= 3, 1,
+                                     #0: grade 9 and below
+                                     ifelse(HHEDUC < 3, 0, 0))))) %>%
+  #EXTRACT DATA FROM DATABASE USING collect()
+  collect(., n = Inf) -> temp 
 
-    #EXTRACT DATA FROM DATABASE USING collect()
-  collect %>%
-    #CLEAN DATA EXTRACTED FROM DATABASE
+#do these outcomes match the way you've grouped education levels above?
+#most common groupings are: less than HSD, HSD, Some College, Bachelors, More than Bachelors
+
+temp %>%
+  group_by(HHEDUC) %>%
+  summarise(n = n(), `median income` = median(HHINCOME)) %>%
+  ggplot(aes(x = as.factor(HHEDUC), y = `median income`, size = n)) + 
+  geom_point(stat = "identity")
+
+temp %>%
+  sample_n(100000) %>%
+  ggplot(aes(x = as.factor(HHEDUC), y = HHINCOME)) +
+  geom_boxplot()
+
+############################
+
+
+#CLEAN DATA EXTRACTED FROM DATABASE
+temp %>%
   mutate(#map abbreviation
-   EDUC = plyr::mapvalues(EDUC, 0:3, c("Less than middle school education",
-                                        "Some high school education",
-                                        "High school education",
-                                        "College education"))
- ) %>%
-  
+    HHEDUC = plyr::mapvalues(HHEDUC, 0:3, c("Middle school or less",
+                                          "Some high school education",
+                                          "High school education",
+                                          "College education"))) -> temp
+
+temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
-  arrange(EDUC) %>%
-  group_by(EDUC) %>%
-   ggplot() +
-    geom_smooth(aes(x = AGE , y = HHINCOME)) +
-  scale_size(guide = FALSE) + 
-  scale_alpha(guide = FALSE) +
-    facet_wrap(~ EDUC, scales = "free") + 
+  ggplot(aes(x = AGE , y = HHINCOME / 1000, color = HHEDUC)) +
+    geom_smooth() +
+    facet_wrap(~ HHEDUC, scales = "free") + 
     theme_minimal() + 
+    theme(legend.position = "none") +
     xlab("Age") + 
-    ylab("Household Income")
-  #  scale_size(guide = FALSE) + 
-  #  scale_alpha(guide = FALSE) +
+    ylab("Household Income in thousands") +
     ggtitle("Household Income by Age, by Education") + 
-    theme(legend.position = "bottom")
+    theme(legend.position = "bottom") +
+    scale_y_continuous(labels = scales::dollar)
