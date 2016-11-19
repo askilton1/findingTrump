@@ -88,12 +88,12 @@ temp %>%
   filter(#(Child == 1 & AGE <= 50) | Child == 0,
          RELATE == 1) %>%
   ggplot(aes(x = AGE , y = HHINCOME / 1000, color = HHEDUC)) +
-  geom_smooth() +
-  facet_wrap(~ HHEDUC, scales = "free") + 
-  theme_minimal() + 
-  theme(legend.position = "none") +
-  xlab("Age") + 
-  ylab("Household Income in thousands") +
-  ggtitle("Household Income by Age, by Education") + 
-  theme(legend.position = "bottom") +
-  scale_y_continuous(labels = scales::dollar)
+    geom_smooth() +
+    facet_wrap( ~ METRO, scales = "free_x") + 
+    theme_minimal() + 
+    theme(legend.position = "none") +
+    xlab("Age of Head of Household") + 
+    ylab("Household Income in thousands") +
+    ggtitle("Household Income by Age, by Education") + 
+    theme(legend.position = "bottom") +
+    scale_y_continuous(labels = scales::dollar)
