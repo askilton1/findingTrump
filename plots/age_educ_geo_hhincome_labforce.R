@@ -49,6 +49,20 @@ METRO_labels <- c("not identifiable",
 ##10 4 years of college
 ##11 5+ years of college
 
+EDUC_labels <- c(#"N/A or no schooling",
+                "Less than high school",
+                "Less than high school",
+                "Less than high school",
+                "Less than high school",
+                "Less than high school",
+                "High School",
+                "Some College",
+                "Some College",
+                "Some College",
+                "Bachelors Degree",
+                "Postgraduate study")
+
+
 # STRUCTURE SQL QUERY USING DPLYR
 # Capped income at 250,000
 tbl(my_db, sql("select a.SERIAL, a.METRO, a.AGE, a.HHINCOME, a.EDUC, b.HHEDUC 
@@ -82,18 +96,7 @@ temp %>%
 #CLEAN DATA EXTRACTED FROM DATABASE
 temp %>%
   mutate(#map abbreviation
-    HHEDUC = plyr::mapvalues(HHEDUC, 0:11, c("N/A or no schooling",
-                                             "Nursery school to grade 4",
-                                             "Grade 5, 6, 7, or 8",
-                                             "Grade 9",
-                                             "Grade 10",
-                                             "Grade 11",
-                                             "Grade 12",
-                                             "1 year of college",
-                                             "2 years of college",
-                                             "3 years of college",
-                                             "4 years of college",
-                                             "5+ years of college"))) -> temp
+    HHEDUC = plyr::mapvalues(HHEDUC, 1:11, EDUC_labels),
     METRO = plyr::mapvalues(METRO, 0:4, METRO_labels),
 
 temp %>%
