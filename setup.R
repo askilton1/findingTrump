@@ -1,4 +1,3 @@
-#place /programs in same directory along with a /data folder 
 #for a dplyr sqlite tutorial: https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html
 #to download required data files: https://www.dropbox.com/sh/ojjasinnk17mi0m/AAAJtygVHup26jDH9Y8_bTvha?dl=0
 library(tidyverse)
@@ -18,7 +17,7 @@ tables <- src_tbls(my_db)
 
 #reset directory to data folder
 
-#2001
+#2001_1year
 #if the csv is available and the ACS_2001 table does not exist
 if("usa_00002.csv" %in% list.files("data") & !("ACS_2001" %in% tables)){
   read_csv("data/usa_00002.csv",
@@ -30,9 +29,23 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2001" %in% tables)){
     copy_to(dest = my_db, df =  ., name = "ACS_2001", temporary = F)
 }
 
-#2015
+#2015_1year
 #if the csv is available and the ACS_2015 table does not exist
 if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
+  read_csv("data/usa_00002.csv",
+           #skip 2001 rows
+           skip = 1192207,
+           #can't figure out how to both skip rows and retain header
+           col_names = names(read_csv("usa_00002.csv", n_max = 1))) %>%
+    #select columns where values are not 100% missing
+    select_if(function(col) sum(is.na(col))/1192206 != 1) %>%
+    #create a new table in database
+    copy_to(dest = my_db, df = ., name = "ACS_2015", temporary = F)
+}
+
+#2015_1year
+#if the csv is available and the ACS_2015 table does not exist
+if("usa_00003.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
   read_csv("data/usa_00002.csv",
            #skip 2001 rows
            skip = 1192207,
