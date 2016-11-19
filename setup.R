@@ -43,18 +43,12 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
     copy_to(dest = my_db, df = ., name = "ACS_2015", temporary = F)
 }
 
-#2015_1year
-#if the csv is available and the ACS_2015 table does not exist
-if("usa_00003.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
-  read_csv("data/usa_00002.csv",
-           #skip 2001 rows
-           skip = 1192207,
-           #can't figure out how to both skip rows and retain header
-           col_names = names(read_csv("usa_00002.csv", n_max = 1))) %>%
-    #select columns where values are not 100% missing
-    select_if(function(col) sum(is.na(col))/1192206 != 1) %>%
+#2013_5year
+#if the csv is available and the ACS_2013_5year table does not exist
+if("usa_00003.csv" %in% list.files("data") & !("ACS_2013_5year" %in% tables)){
+  read_csv("data/usa_00003.csv") %>%
     #create a new table in database
-    copy_to(dest = my_db, df = ., name = "ACS_2015", temporary = F)
+    copy_to(dest = my_db, df = ., name = "ACS_2013_5year", temporary = F)
 }
 
 #FDIC 2009-2015 AFS Census Supplement
