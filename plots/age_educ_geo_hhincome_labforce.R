@@ -65,7 +65,7 @@ EDUC_labels <- c(#"N/A or no schooling",
 
 # STRUCTURE SQL QUERY USING DPLYR
 # Capped income at 250,000
-tbl(my_db, sql("select a.SERIAL, a.METRO, a.AGE, a.HHINCOME, a.EDUC, b.HHEDUC 
+tbl(my_db, sql("select a.SERIAL, a.METRO, a.RACE, a.SEX, a.AGE, a.RELATE, a.HHINCOME, a.EDUC, b.HHEDUC 
                from ACS_2015 a
                left outer join (
                                  select SERIAL, max(EDUC) as HHEDUC
