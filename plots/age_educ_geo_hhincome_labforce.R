@@ -65,7 +65,7 @@ EDUC_labels <- c(#"N/A or no schooling",
 
 # STRUCTURE SQL QUERY USING DPLYR
 # Capped income at 250,000
-tbl(my_db, sql("select a.SERIAL, a.METRO, a.RACWHT, a.SEX, a.AGE, a.RELATE, a.HHINCOME, a.EDUC, b.HHEDUC 
+tbl(my_db, sql("select a.SERIAL, a.METRO, a.AGE, a.RELATE, a.HHINCOME, b.HHEDUC 
                from ACS_2015 a
                left outer join (
                                  select SERIAL, max(EDUC) as HHEDUC
@@ -74,19 +74,17 @@ tbl(my_db, sql("select a.SERIAL, a.METRO, a.RACWHT, a.SEX, a.AGE, a.RELATE, a.HH
                on a.SERIAL = b.SERIAL
                where HHINCOME < 2000000 and EDUC != 0")) %>%
   #EXTRACT DATA FROM DATABASE USING collect()
-  collect(., n = Inf) -> temp 
+  collect(., n = Inf) %>% 
 
 #CLEAN DATA EXTRACTED FROM DATABASE
-temp %>%
+
   mutate(HHEDUC = plyr::mapvalues(HHEDUC, 1:11, EDUC_labels),
          METRO = plyr::mapvalues(METRO, 0:4, METRO_labels),
          Child = ifelse(RELATE == 3 | RELATE == 4 | RELATE == 9, 1, 0),
-         Head = ifelse(RELATE == 1, "head of household", "not head of household"),
-         RACWHT = RACWHT - 1) -> temp
+         Head = ifelse(RELATE == 1, "head of household", "not head of household")) %>%
 
-temp %>%
-  filter(#(Child == 1 & AGE <= 50) | Child == 0,
-         RELATE == 1) %>%
+#PLOT!
+  filter(RELATE == 1) %>%
   ggplot(aes(x = AGE , y = HHINCOME / 1000, color = HHEDUC)) +
     geom_smooth() +
     facet_wrap( ~ METRO, scales = "free_x") + 
@@ -94,6 +92,6 @@ temp %>%
     theme(legend.position = "none") +
     xlab("Age of Head of Household") + 
     ylab("Household Income in thousands") +
-    ggtitle("Household Income by Age, by Education") + 
+    ggtitle("Head of Household Household Income by Age, by Education") + 
     theme(legend.position = "bottom") +
     scale_y_continuous(labels = scales::dollar)
