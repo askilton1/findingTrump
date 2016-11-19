@@ -10,7 +10,7 @@ survey_label_mapper <- function(df){
   
   if("METRO" %in% names(df)) df <- mutate(df, METRO = plyr::mapvalues(METRO, 0:4, c("not identifiable",
                                                                                     "not in metro area",
-                                                                                    rep("In metro area",3)))) 
+                                                                                    rep("In metro area", 3)))) 
   #POVERTY
   ## 000 = N/A
   ## 001 = 1% or less of poverty threshold
