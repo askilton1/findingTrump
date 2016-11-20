@@ -20,7 +20,8 @@ tbl(my_db, sql("select a.YEAR, a.SERIAL, a.STATEFIP, a.COUNTY, a.REGION, a.METRO
 temp %>%
   filter(COUNTY != 0) %>%
   group_by(STATEFIP, COUNTY) %>%
-  mutate(college = ifelse(HHEDUC == "Bachelors Degree" | HHEDUC == "Postgraduate study", 1, 0)) %>%
+  mutate(college = ifelse(HHEDUC == "Bachelors Degree" | HHEDUC == "Postgraduate study", 1, 0),
+         METRO = ifelse(METRO == "In metro area", 1, 0)) %>%
   summarise(n = n(),
             percent_white = mean(RACWHT),
             percent_college = mean(college),
