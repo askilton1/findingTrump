@@ -10,7 +10,30 @@ survey_label_mapper <- function(df){
   
   if("METRO" %in% names(df)) df <- mutate(df, METRO = plyr::mapvalues(METRO, 0:4, c("not identifiable",
                                                                                     "not in metro area",
-                                                                                    rep("In metro area", 3)))) 
+                                                                                    rep("In metro area", 3))))
+  
+  if("REGION" %in% names(df)) df <- mutate(df, REGION = plyr::mapvalues(REGION, c(11:13, 21:23, 31:34, 
+                                                                                  41:43, 91:92, 97, 99), c("New England",
+                                                                                                           "Middle Atlantic",
+                                                                                                           "Mixed Northeast",
+                                                                                                           "East North Central",
+                                                                                                           "West North Central",
+                                                                                                           "Mixed Midwest",
+                                                                                                           "South Atlantic",
+                                                                                                           "East South Central",
+                                                                                                           "West South Central",
+                                                                                                           "Mixed Southern",
+                                                                                                           "Mountain",
+                                                                                                           "Pacific",
+                                                                                                           "Mixed Western",
+                                                                                                           "Military/Miltary reservations",
+                                                                                                           "PUMA boundaries cross state lines",
+                                                                                                           "State not identified",
+                                                                                                           "Not identified")))
+  
+
+  ##2 Midwest
+  ##3 South 
   #POVERTY
   ## 000 = N/A
   ## 001 = 1% or less of poverty threshold
