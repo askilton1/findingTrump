@@ -47,7 +47,9 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
 #if the csv is available and the ACS_2013_5year table does not exist
 if("usa_00005.csv" %in% list.files("data") & !("ACS_2013_5year" %in% tables)){
   read_csv("data/usa_00005.csv",
-           col_types = cols_only(SERIAL = col_integer(),
+           col_types = cols_only(YEAR = col_integer(),
+                                 SERIAL = col_integer(),
+                                 DATANUM = col_integer(),
                                  PERNUM = col_integer(),
                                  REGION = col_integer(),
                                  STATEFIP = col_integer(),
