@@ -1,4 +1,3 @@
-#place /programs in same directory along with a /data folder 
 #for a dplyr sqlite tutorial: https://cran.r-project.org/web/packages/dplyr/vignettes/databases.html
 #to download required data files: https://www.dropbox.com/sh/ojjasinnk17mi0m/AAAJtygVHup26jDH9Y8_bTvha?dl=0
 library(tidyverse)
@@ -18,7 +17,7 @@ tables <- src_tbls(my_db)
 
 #reset directory to data folder
 
-#2001
+#2001_1year
 #if the csv is available and the ACS_2001 table does not exist
 if("usa_00002.csv" %in% list.files("data") & !("ACS_2001" %in% tables)){
   read_csv("data/usa_00002.csv",
@@ -30,7 +29,7 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2001" %in% tables)){
     copy_to(dest = my_db, df =  ., name = "ACS_2001", temporary = F)
 }
 
-#2015
+#2015_1year
 #if the csv is available and the ACS_2015 table does not exist
 if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
   read_csv("data/usa_00002.csv",
@@ -42,6 +41,41 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
     select_if(function(col) sum(is.na(col))/1192206 != 1) %>%
     #create a new table in database
     copy_to(dest = my_db, df = ., name = "ACS_2015", temporary = F)
+}
+
+#2013_5year
+#if the csv is available and the ACS_2013_5year table does not exist
+if("usa_00005.csv" %in% list.files("data") & !("ACS_2013_5year" %in% tables)){
+  read_csv("data/usa_00005.csv",
+           col_types = cols_only(YEAR = col_integer(),
+                                 SERIAL = col_integer(),
+                                 DATANUM = col_integer(),
+                                 PERNUM = col_integer(),
+                                 REGION = col_integer(),
+                                 STATEFIP = col_integer(),
+                                 COUNTY = col_integer(),
+                                 METRO = col_integer(),
+                                 RACWHT = col_integer(),
+                                 SEX = col_integer(),
+                                 AGE = col_integer(),
+                                 RELATE = col_integer(),
+                                 HHINCOME = col_integer(),
+                                 EDUC = col_integer(),
+                                 METRO = col_integer(),
+                                 POVERTY = col_integer(),
+                                 LABFORCE = col_integer(),
+                                 CITIZEN = col_integer(),
+                                 HCOVANY = col_integer(),
+                                 HCOVPRIV = col_integer(),
+                                 HCOVPUB = col_integer(),
+                                 HINSCAID = col_integer(),
+                                 EMPSTAT = col_integer(),
+                                 EMPSTATD = col_integer(),
+                                 INCWELFR = col_integer(),
+                                 MOVEDIN = col_integer(),
+                                 MIGPLAC1 = col_integer())) %>%
+    #create a new table in database
+    copy_to(dest = my_db, df = ., name = "ACS_2013_5year", temporary = F)
 }
 
 #FDIC 2009-2015 AFS Census Supplement
