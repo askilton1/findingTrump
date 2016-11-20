@@ -1,26 +1,7 @@
 # TK Test - Deleted the extra line and added this sentence.
 library(tidyverse)
+source("survey_label_mapper.R")
 my_db <- src_sqlite("finding_trump.db", create = F)
-
-#METRO:
-##1: not in metro area
-##2: In metro area, central/principal city
-##3: In metro area, outside central/principal city
-##4: Central/Principal city status unknown
-
-#POVERTY
-## 000 = N/A
-## 001 = 1% or less of poverty threshold
-## 501 = 501% or more of poverty threshold
-
-#RACWHT
-## 1: No
-## 2: Yes
-
-#LABFORCE
-##0: N/A
-##1: No, not in the labor force
-##2: Yes, in the labor force
 
 # STRUCTURE SQL QUERY USING DPLYR
 tbl(my_db, sql("select * from ACS_2015")) %>%
@@ -41,24 +22,10 @@ tbl(my_db, sql("select * from ACS_2015")) %>%
   
   #EXTRACT DATA FROM DATABASE USING collect()
   
-  collect %>%
+  collect(., n = Inf) %>%
   
-  #CLEAN DATA EXTRACTED FROM DATABASE
-  ###need to fill in gaps in STATEFIP
-  mutate(STATEFIP = ifelse(STATEFIP >= 53, STATEFIP - 1, STATEFIP),
-         STATEFIP = ifelse(STATEFIP >= 44, STATEFIP - 1, STATEFIP),
-         STATEFIP = ifelse(STATEFIP >= 15, STATEFIP - 1, STATEFIP),
-         STATEFIP = ifelse(STATEFIP >= 8, STATEFIP - 1, STATEFIP),
-         STATEFIP = ifelse(STATEFIP >= 4, STATEFIP - 1, STATEFIP),
-         #map abbreviation
-         STATEFIP = plyr::mapvalues(STATEFIP, 1:51, c(state.abb[1:10], "DC", state.abb[11:50])),
-         METRO = plyr::mapvalues(METRO, 1:4, c("Not in metro area", 
-                                               "In metro area, central/principal city",
-                                               "In metro area, outside central/principal city",
-                                               "Central/Principal city status unknown")),
-         RACWHT = as.factor(plyr::mapvalues(RACWHT, 0:1, c("not White", "White")))
-  ) %>%
-  
+  survey_label_mapper() %>%
+
   #MANIPULATE DATA FOR SPECIFIC GRAPH
   
   arrange(STATEFIP, METRO) %>%
