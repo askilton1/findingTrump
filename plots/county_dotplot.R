@@ -5,11 +5,11 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 #on county level data
 # STRUCTURE SQL QUERY USING DPLYR
 # Capped income at 250,000
-               from ACS_2015 a
 tbl(my_db, sql("select a.YEAR, a.SERIAL, a.STATEFIP, a.COUNTY, a.REGION, a.METRO, a.RACWHT, a.AGE, a.HHINCOME, b.HHEDUC 
+               from ACS_2013_5year a
                left outer join (
                select SERIAL, max(EDUC) as HHEDUC
-               from ACS_2015 
+               from ACS_2013_5year 
                group by SERIAL) b
                on a.SERIAL = b.SERIAL
                where HHINCOME < 2000000 and EDUC != 0")) %>%
