@@ -36,6 +36,6 @@ temp %>%
     theme(legend.position = "minimal") +
     labs(y = "Intra-county income gap, in thousands of dollars",
          x = "Percent of county with college degree",
-         title = "College education rates are correlated with income disparity",
+         title = "Counties with higher college education rates have higher income disparity",
          subtitle = "This correlation is especially strong in the Pacific, Middle Atlantic, and South Atlantic")
 ggsave("plots/output/college_degree_and_income_gap_by_region.pdf")
