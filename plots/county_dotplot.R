@@ -22,7 +22,7 @@ temp %>%
   group_by(STATEFIP, COUNTY) %>%
   mutate(college = ifelse(HHEDUC == "Bachelors Degree" | HHEDUC == "Postgraduate study", 1, 0),
          METRO = ifelse(METRO == "In metro area", 1, 0)) %>%
-  summarise(n = n(),
+  summarise(n = n() / 1000,
             percent_white = mean(RACWHT),
             percent_college = mean(college),
             mean_hhincome = mean(HHINCOME) / 1000,
