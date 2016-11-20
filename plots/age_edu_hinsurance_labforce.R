@@ -18,7 +18,7 @@ tbl(my_db, sql("select a.SERIAL, a.AGE, a.HHINCOME, b.HHEDUC
 
 temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
-  ggplot(aes(x = AGE , y = HHINCOME / 1000, color = HHEDUC)) +
+  ggplot(aes(x = AGE , y = HHINCOME / 1000)) +
     geom_smooth() +
     facet_wrap(~ HHEDUC, scales = "free") + 
     theme_minimal() + 
