@@ -25,7 +25,7 @@ temp %>%
   summarise(n = n(),
             percent_white = mean(RACWHT),
             percent_college = mean(college),
-            mean_hhincome = mean(HHINCOME),
+            mean_hhincome = mean(HHINCOME) / 1000,
             majority_minority = as.factor(ifelse(mean(RACWHT) >= .5, 0, 1)),
             metropolitan = as.factor(ifelse(mean(METRO) > 0.5, 1, 0))
             ) %>%
