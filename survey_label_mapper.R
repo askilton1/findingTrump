@@ -20,6 +20,8 @@ survey_label_mapper <- function(df){
   ## 1: No
   ## 2: Yes
   
+  if("METRO" %in% names(df)) df <- mutate(df, METRO = METRO - 1)
+  
   # STRUCTURE SQL QUERY USING DPLYR
   # AGE
   
