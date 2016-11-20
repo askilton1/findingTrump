@@ -19,7 +19,7 @@ tbl(my_db, sql("select a.YEAR, a.DATANUM, a.SERIAL, a.STATEFIP, a.COUNTY, a.REGI
 
 temp %>%
   filter(COUNTY != 0) %>%
-  group_by(STATEFIP, COUNTY) %>%
+  group_by(REGION, STATEFIP, COUNTY) %>%
   mutate(college = ifelse(HHEDUC == "Bachelors Degree" | HHEDUC == "Postgraduate study", 1, 0),
          METRO = ifelse(METRO == "In metro area", 1, 0)) %>%
   summarise(n = n() / 1000,
@@ -28,13 +28,14 @@ temp %>%
             income_gap = as.numeric(summary(HHINCOME)[5] - summary(HHINCOME)[2]) / 1000,
             #metropolitan = as.factor(ifelse(mean(METRO) > 0.5, 1, 0))
             metro = mean(METRO)) %>%
-  ggplot(aes(x = income_gap, y = percent_college)) +
-    geom_point(aes(size = n#, color = metro, alpha = metro
-                   )) +
-    facet_wrap(~ cut_number(percent_white, 4)) +
-    #geom_smooth() +
+  ggplot(aes(x = percent_college, y = income_gap, alpha = 0.5, size = n)) +
+    geom_point() +
+    geom_smooth() +
+    facet_wrap(~ REGION) +
     theme_minimal() + 
-    labs(x = "Intra-County Income Gap",
-         title = "Percentage of county with college degree",
-         subtitle = "test")
-
+    theme(legend.position = "minimal") +
+    labs(y = "Intra-county income gap, in thousands of dollars",
+         x = "Percent of county with college degree",
+         title = "College education rates are correlated with income disparity",
+         subtitle = "This correlation is especially strong in the Pacific, Middle Atlantic, and South Atlantic")
+ggsave("plots/output/college_degree_and_income_gap_by_region.pdf")
