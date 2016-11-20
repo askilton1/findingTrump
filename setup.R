@@ -45,8 +45,33 @@ if("usa_00002.csv" %in% list.files("data") & !("ACS_2015" %in% tables)){
 
 #2013_5year
 #if the csv is available and the ACS_2013_5year table does not exist
-if("usa_00003.csv" %in% list.files("data") & !("ACS_2013_5year" %in% tables)){
-  read_csv("data/usa_00003.csv") %>%
+if("usa_00005.csv" %in% list.files("data") & !("ACS_2013_5year" %in% tables)){
+  read_csv("data/usa_00005.csv",
+           col_types = cols_only(SERIAL = col_integer(),
+                                 PERNUM = col_integer(),
+                                 REGION = col_integer(),
+                                 STATEFIP = col_integer(),
+                                 COUNTY = col_integer(),
+                                 METRO = col_integer(),
+                                 RACWHT = col_integer(),
+                                 SEX = col_integer(),
+                                 AGE = col_integer(),
+                                 RELATE = col_integer(),
+                                 HHINCOME = col_integer(),
+                                 EDUC = col_integer(),
+                                 METRO = col_integer(),
+                                 POVERTY = col_integer(),
+                                 LABFORCE = col_integer(),
+                                 CITIZEN = col_integer(),
+                                 HCOVANY = col_integer(),
+                                 HCOVPRIV = col_integer(),
+                                 HCOVPUB = col_integer(),
+                                 HINSCAID = col_integer(),
+                                 EMPSTAT = col_integer(),
+                                 EMPSTATD = col_integer(),
+                                 INCWELFR = col_integer(),
+                                 MOVEDIN = col_integer(),
+                                 MIGPLAC1 = col_integer())) %>%
     #create a new table in database
     copy_to(dest = my_db, df = ., name = "ACS_2013_5year", temporary = F)
 }
