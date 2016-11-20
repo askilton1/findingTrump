@@ -25,11 +25,16 @@ temp %>%
   summarise(n = n() / 1000,
             percent_white = mean(RACWHT),
             percent_college = mean(college),
-            mean_hhincome = mean(HHINCOME) / 1000,
-            majority_minority = as.factor(ifelse(mean(RACWHT) >= .5, 0, 1)),
-            metropolitan = as.factor(ifelse(mean(METRO) > 0.5, 1, 0))
-            ) %>%
-ggplot(aes(x = mean_hhincome, y = percent_college, size = n, color = metropolitan, alpha = metropolitan)) +
-  geom_point() + 
-  theme_minimal()
+            income_gap = as.numeric(summary(HHINCOME)[5] - summary(HHINCOME)[2]) / 1000,
+            #metropolitan = as.factor(ifelse(mean(METRO) > 0.5, 1, 0))
+            metro = mean(METRO)) %>%
+  ggplot(aes(x = income_gap, y = percent_college)) +
+    geom_point(aes(size = n#, color = metro, alpha = metro
+                   )) +
+    facet_wrap(~ cut_number(percent_white, 4)) +
+    #geom_smooth() +
+    theme_minimal() + 
+    labs(x = "Intra-County Income Gap",
+         title = "Percentage of county with college degree",
+         subtitle = "test")
 
