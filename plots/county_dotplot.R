@@ -8,10 +8,10 @@ my_db <- src_sqlite("finding_trump.db", create = F)
 tbl(my_db, sql("select a.YEAR, a.SERIAL, a.STATEFIP, a.COUNTY, a.REGION, a.METRO, a.RACWHT, a.AGE, a.HHINCOME, b.HHEDUC 
                from ACS_2013_5year a
                left outer join (
-               select SERIAL, max(EDUC) as HHEDUC
+               select YEAR, SERIAL, max(EDUC) as HHEDUC
                from ACS_2013_5year 
                group by SERIAL) b
-               on a.SERIAL = b.SERIAL
+               on (a.SERIAL = b.SERIAL AND a.YEAR = b.YEAR)
                where HHINCOME < 2000000 and EDUC != 0")) %>%
   #EXTRACT DATA FROM DATABASE USING collect()
   collect(., n = Inf) %>%
