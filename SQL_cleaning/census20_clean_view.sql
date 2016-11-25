@@ -13,9 +13,13 @@ as
 				when EDUC <= 5 then 1 -- less than high school degree
 			end as educ,
 			case 
-				when EDUC >= 6 then 1
+				when EDUC >= 10 then 1
 				else 0
 			end as college,
+			case 
+				when EDUC >= 6 then 1
+				else 0
+			end as high_school_degree,
 			case 
 				when SEX = 2 then 0
 				else 1

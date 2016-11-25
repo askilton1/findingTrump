@@ -5,6 +5,7 @@ alter view household_level_variables as
 			(select 
 				SERIAL,
 				max(white) [hh_White], --at least one person in household is white
+				max(high_school_degree) [hh_High_School_Degree], --at least one person has college degree
 				max(college) [hh_College_Degree], --at least one person has college degree
 				max(hispanic) [hh_Hispanic], --at least one person in household is hispanic
 				max(female_head) [hh_Female_Head_of_Household], --"head of household" is female
