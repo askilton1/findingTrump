@@ -27,5 +27,13 @@ as
 			case
 				when SEX = 2 and RELATE = 1 then 1
 				else 0
-			end as female_head
+			end as female_head,
+			case
+				when EMPSTAT != 3 then 1
+				else 0
+			end as in_labor_force,
+			case
+				when EMPSTAT = 3 and SEX = 1 and AGE >= 18 then 1
+				else 0 
+			end as adult_men_not_in_labor_force
 	from census_2013_5year
