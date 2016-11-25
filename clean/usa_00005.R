@@ -1,6 +1,7 @@
 library(tidyverse)
 
 read_csv("data/raw/usa_00005.csv", col_types = cols_only(RECTYPE = col_guess(),
+                                                         RELATE = col_guess(),
                                                          YEAR = col_guess(),
                                                          DATANUM = col_guess(),
                                                          SERIAL = col_guess(),
