@@ -1,4 +1,4 @@
-create view census20_clean
+alter view census20_clean
 as
 	select RECTYPE, DATANUM, SERIAL, PERNUM, REGION, STATEFIP, COUNTY, METRO, HHINCOME, AGE, RACE,
 			case 
@@ -18,5 +18,10 @@ as
 				when SEX = 2 then 0
 				else 1
 			end
-				as male
+				as male,
+			case
+				when RACE = 1 then 0
+				else 1
+			end
+				as white
 	from census20
