@@ -30,7 +30,11 @@ south <- dbSendQuery(aw, 'SELECT * FROM dbo.household_level_variables
 
 # Disconnect from DB
 dbDisconnect(aw)
-library(ggplot2)
+library(devtools)
+install_github("cran/scales")
+install_github("hadley/lazyeval")
+install_github("tidyverse/ggplot2") #needed to get new ggplot 2.2
+
 south %>%
   filter(RACE != "American Indian") %>% 
   group_by(STATEFIP, COUNTY, RACE) %>%
