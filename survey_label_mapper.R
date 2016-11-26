@@ -12,25 +12,38 @@ survey_label_mapper <- function(df){
                                                                                     "not in metro area",
                                                                                     rep("In metro area", 3))))
   
-  if("REGION" %in% names(df)) df <- mutate(df, REGION = plyr::mapvalues(REGION, c(11:13, 21:23, 31:34, 
-                                                                                  41:43, 91:92, 97, 99), c("New England",
-                                                                                                           "Middle Atlantic",
-                                                                                                           "Mixed Northeast",
-                                                                                                           "East North Central",
-                                                                                                           "West North Central",
-                                                                                                           "Mixed Midwest",
-                                                                                                           "South Atlantic",
-                                                                                                           "East South Central",
-                                                                                                           "West South Central",
-                                                                                                           "Mixed Southern",
-                                                                                                           "Mountain",
-                                                                                                           "Pacific",
-                                                                                                           "Mixed Western",
-                                                                                                           "Military/Miltary reservations",
-                                                                                                           "PUMA boundaries cross state lines",
-                                                                                                           "State not identified",
-                                                                                                           "Not identified")))
+  if("RACE" %in% names(df)) df <- mutate(df, RACE = plyr::mapvalues(RACE, 1:9, c("White",
+                                                                                 "Black",
+                                                                                 "American Indian",
+                                                                                 #rep("Asian", 3),
+                                                                                 rep("Other", 6))))
   
+  # if("REGION" %in% names(df)) df <- mutate(df, REGION = plyr::mapvalues(REGION, c(11:13, 21:23, 31:34, 
+  #                                                                                 41:43, 91:92, 97, 99), c("New England",
+  #                                                                                                          "Middle Atlantic",
+  #                                                                                                          "Mixed Northeast",
+  #                                                                                                          "East North Central",
+  #                                                                                                          "West North Central",
+  #                                                                                                          "Mixed Midwest",
+  #                                                                                                          "South Atlantic",
+  #                                                                                                          "East South Central",
+  #                                                                                                          "West South Central",
+  #                                                                                                          "Mixed Southern",
+  #                                                                                                          "Mountain",
+  #                                                                                                          "Pacific",
+  #                                                                                                          "Mixed Western",
+  #                                                                                                          "Military/Miltary reservations",
+  #                                                                                                          "PUMA boundaries cross state lines",
+  #                                                                                                          "State not identified",
+  #                                                                                                          "Not identified")))
+  
+  if("REGION" %in% names(df)) df <- mutate(df, REGION = plyr::mapvalues(REGION, c(11:13, 21:23, 31:34, 
+                                                                                  41:43, 91:92, 97, 99), c(rep("Northeast", 3),
+                                                                                                           rep("Midwest", 3),
+                                                                                                           rep("South", 4),
+                                                                                                           rep("West", 3),
+                                                                                                           rep("Unknown", 4))
+                                                                        ))
 
   ##2 Midwest
   ##3 South 
