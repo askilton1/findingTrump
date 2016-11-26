@@ -48,7 +48,8 @@ south %>%
             hispanic = mean(hh_Hispanic),
             labor_force = mean(hh_labor_force),
             income = median(HHINCOME) / 1000) %>%
-  #filter(STATEFIP == "FL")
+  # ungroup %>% 
+  # arrange(n)
   ggplot(aes(x = college, y = income, size = n, alpha = 0.5, color = RACE)) +
     geom_point(stat = "identity") + 
     facet_wrap(~STATEFIP) + 
