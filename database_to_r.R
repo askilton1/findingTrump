@@ -22,7 +22,7 @@ aw <- DBI::dbConnect(RSQLServer::SQLServer(), "AW", database = "skilton_db")
 library(dplyr)
 source("survey_label_mapper.R")
 
-south <- dbSendQuery(aw, 'SELECT * FROM dbo.household_level_variables
+south <- dbSendQuery(aw, 'SELECT * FROM dbo.census_hhold
                           WHERE REGION >= 30 and REGION < 40') %>% #The south
             dbFetch() %>%
             survey_label_mapper %>%
