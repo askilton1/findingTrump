@@ -1,4 +1,4 @@
-alter view household_level_variables as
+alter view census_hhold as
 	select a.REGION, a.STATEFIP, a.COUNTY, a.METRO, a.HHINCOME, a.AGE, a.RACE, b.*
 		from census_2013_5year_clean a
 		inner join
