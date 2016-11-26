@@ -98,12 +98,12 @@ survey_label_mapper <- function(df){
                                                                                         "Bachelors Degree",
                                                                                         "Postgraduate study")))
   ###need to fill in gaps in STATEFIP
-  if("STATEFIP" %in% names(df)) df <- mutate(df, STATEFIP = ifelse(STATEFIP >= 53, STATEFIP - 1, STATEFIP),
-                                                 STATEFIP = ifelse(STATEFIP >= 44, STATEFIP - 1, STATEFIP),
-                                                 STATEFIP = ifelse(STATEFIP >= 15, STATEFIP - 1, STATEFIP),
-                                                 STATEFIP = ifelse(STATEFIP >= 8, STATEFIP - 1, STATEFIP),
-                                                 STATEFIP = ifelse(STATEFIP >= 4, STATEFIP - 1, STATEFIP),
-                                                 #map abbreviation
-                                                 STATEFIP = plyr::mapvalues(STATEFIP, 1:51, c(state.abb[1:10], "DC", state.abb[11:50]))) 
+  if("STATEFIP" %in% names(df)) df <- mutate(df, STATEFIP = plyr::mapvalues(STATEFIP, c(1:2, 4:6, 8:13, 15:42, 44:51, 53:56), 
+                                                                            c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DL", "DC", "FL",
+                                                                              "GA", "HI", "ID", "IL", "IN", "IA", "KA", "KY", "LA",
+                                                                              "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE",
+                                                                              "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK",
+                                                                              "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT",
+                                                                              "VA", "WA", "WV", "WI", "WY"))) 
   return(df)
 }
