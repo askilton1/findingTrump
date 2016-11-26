@@ -19,9 +19,14 @@ aw <- DBI::dbConnect(RSQLServer::SQLServer(), "AW", database = "skilton_db")
 
 
 # Fetch all results
-res <- dbSendQuery(aw, 'SELECT TOP 10 * FROM dbo.AFS')
-dbFetch(res)
-dbClearResult(res)
+library(dplyr)
+source("survey_label_mapper.R")
+
+south <- dbSendQuery(aw, 'SELECT * FROM dbo.household_level_variables
+                          WHERE REGION >= 30 and REGION < 40') %>% #The south
+            dbFetch() %>%
+            survey_label_mapper %>%
+            tbl_df
 
 # Disconnect from DB
 dbDisconnect(aw)
