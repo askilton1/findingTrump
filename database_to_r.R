@@ -1,6 +1,6 @@
 library(checkpoint) #we will have to use a checkpoint until RSQLServer package updates to accomodate new version of dplyr
 checkpoint("2016-05-01", checkpointLocation = tempdir()); "y"
-#library(RSQLServer)
+
 #############
 # DBI
 #############
