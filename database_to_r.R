@@ -14,8 +14,8 @@ library(DBI)
 aw <- DBI::dbConnect(RSQLServer::SQLServer(), "AW", database = "skilton_db")
 # RSQLServer only returns tables with type TABLE and VIEW.
 # But this DB has lots of useless tables. 
-DBI::dbListTables(aw)
-DBI::dbListFields(aw, 'AFS')
+# DBI::dbListTables(aw)
+# DBI::dbListFields(aw, 'AFS')
 
 
 # Fetch all results
