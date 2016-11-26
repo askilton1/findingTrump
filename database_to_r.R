@@ -30,10 +30,15 @@ south <- dbSendQuery(aw, 'SELECT * FROM dbo.census_hhold
 
 # Disconnect from DB
 dbDisconnect(aw)
+
+#needed to install ggplot 2.2
 library(devtools)
 install_github("cran/scales")
 install_github("hadley/lazyeval")
-install_github("tidyverse/ggplot2") #needed to get new ggplot 2.2
+install_github("hadley/tibble")
+install_github("tidyverse/ggplot2") 
+library(tibble)
+library(ggplot2)
 
 south %>%
   filter(RACE != "American Indian") %>% 
