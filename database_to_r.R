@@ -30,7 +30,36 @@ south <- dbSendQuery(aw, 'SELECT * FROM dbo.household_level_variables
 
 # Disconnect from DB
 dbDisconnect(aw)
+library(ggplot2)
+south %>%
+  filter(RACE != "American Indian") %>% 
+  group_by(STATEFIP, COUNTY, RACE) %>%
+  summarise(n = n(), 
+            college = mean(hh_College_Degree),
+            hispanic = mean(hh_Hispanic),
+            labor_force = mean(hh_labor_force),
+            income = median(HHINCOME) / 1000) %>%
+  #filter(STATEFIP == "FL")
+  ggplot(aes(x = college, y = income, size = n, alpha = 0.5, color = RACE)) +
+    geom_point(stat = "identity") + 
+    facet_wrap(~STATEFIP) + 
+    theme_minimal() + 
+    #theme(legend.position = "none") +
+    scale_y_continuous(labels = scales::dollar) +
+    scale_x_continuous(labels = scales::percent) +
+    ylab("Household Income in Thousands") +
+    xlab("Percent of Households with College Degree")
 
+south %>% 
+  filter(STATEFIP == "WV") %>% 
+  group_by(COUNTY) %>% 
+  summarise(n = n())
+  
+south %>%
+  group_by(hh_adult_men_not_in_labor_force) %>%
+  filter(hh_adult_men_not_in_labor_force < 4, 
+         hh_Female_Head_of_Household == 0) %>% #female headed households
+  summarise_each(funs(round(mean(.), 2)), HHINCOME, hh_White:hh_labor_force)
 #############
 # dplyr
 #############
