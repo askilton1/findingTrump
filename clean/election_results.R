@@ -19,4 +19,4 @@ read_csv("data/raw/Pres_Election_Data_2016i.csv", col_types = cols_only(X1 = col
   mutate_at(3:4, funs(as.numeric(gsub("%", "", .))/100)) %>% 
   na.omit %>% 
   mutate(COUNTY = as.numeric(substrRight(COUNTY, 3))) 
-  write_csv("data/clean/Pres_Election_DatA_2016i.csv")
+  write_csv("data/clean/Pres_Election_DatA_2016i.csv", na = "")
