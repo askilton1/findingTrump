@@ -1,13 +1,12 @@
---select top 100 * from census20_clean
-create view counties as
-select top 10 a.STATEFIP, a.COUNTY, a.REGION, a.METRO, avg(white) [Percent White], avg(a.AGE) [Average Age], avg(a.HHINCOME) [Average Household Income], avg(b.hh_college) [Percent College Degree], max(b.hh_hispanic) [Percent Hispanic]
-	from census20_clean a
-	left outer join ( -- subquery creates household level variables
-					 select DATANUM, SERIAL, max(college) [hh_college], max(hispanic) [hh_hispanic]
-					 from census20_clean
-					 group by DATANUM, SERIAL) b
-	on (a.SERIAL = b.SERIAL AND a.DATANUM = b.DATANUM)
-	where a.HHINCOME < 2000000 and a.EDUC != 0
-	group by a.REGION, a.METRO, a.STATEFIP, a.COUNTY
-
-select top 10 * from counties
+--create view census_counties as
+select a.STATEFIP, a.COUNTY, a.percent_white_hholds_college, b.percent_black_hholds_college
+	from (select STATEFIP, COUNTY, avg(cast(hh_College_Degree as float)) [percent_white_hholds_college]
+		  from census_hhold
+		  where RACE = 1 and STATEFIP < 10
+		  group by STATEFIP, COUNTY) a
+	inner join 
+		(select STATEFIP, COUNTY, avg(cast(hh_College_Degree as float)) [percent_black_hholds_college] 
+			from census_hhold
+			where RACE = 2 and STATEFIP < 10
+			group by STATEFIP, COUNTY) b
+	on a.STATEFIP = b.STATEFIP and a.COUNTY = b.COUNTY
