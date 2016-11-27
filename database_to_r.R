@@ -60,7 +60,6 @@ south %>%
          subtitle = "In most counties Whites outperform Blacks in both household income and college degree attainment.") +
     guides(size = FALSE, alpha = FALSE) +
     theme(legend.position = c(0.9, 0.1)) 
-    
 
 library(ineq)
 south %>% 
