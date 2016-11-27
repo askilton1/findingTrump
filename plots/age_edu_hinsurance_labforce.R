@@ -1,80 +1,30 @@
 library(tidyverse)
+source("survey_label_mapper.R")
 my_db <- src_sqlite("finding_trump.db", create = F)
 
-#METRO:
-##1: not in metro area
-##2: In metro area, central/principal city
-##3: In metro area, outside central/principal city
-##4: Central/Principal city status unknown
-
-#POVERTY
-## 000 = N/A
-## 001 = 1% or less of poverty threshold
-## 501 = 501% or more of poverty threshold
-
-#RACWHT
-## 1: No
-## 2: Yes
-
 # STRUCTURE SQL QUERY USING DPLYR
-# AGE
+# Capped income at 250,000
+tbl(my_db, sql("select a.SERIAL, a.AGE, a.HHINCOME, b.HHEDUC 
+                from ACS_2015 a
+                left outer join (
+                  select SERIAL, max(EDUC) as HHEDUC
+                  from ACS_2015 
+                  group by SERIAL) b
+                  on a.SERIAL = b.SERIAL
+                where HHINCOME < 2000000")) %>%
+  #EXTRACT DATA FROM DATABASE USING collect()
+  collect(., n = Inf) %>%
+  survey_label_mapper() -> temp 
 
-#LABFORCE
-##0: N/A
-##1: No, not in the labor force
-##2: Yes, in the labor force
-
-# HCOVANY
-##1: No health insurance coverage
-##2: With health insurance coverage
-
-# EDUC
-##00 N/A or no schooling
-##01 Nursery school to grade 4
-##02 Grade 5, 6, 7, or 8
-##03 Grade 9
-##04 Grade 10
-##05 Grade 11
-##06 Grade 12
-##07 1 year of college
-##08 2 years of college
-##09 3 years of college
-##10 4 years of college
-##11 5+ years of college
-
-# STRUCTURE SQL QUERY USING DPLYR
-# Capped income at 500,000
-tbl(my_db, sql("select * from ACS_2015")) %>%
-  select(AGE, HHINCOME, EDUC) %>%
-  filter(AGE >= 18,
-         HHINCOME < 250000) %>%
- mutate(EDUC = ifelse(EDUC >= 7, 3, 
-                ifelse(EDUC <7 & EDUC >= 5, 2,
-                      ifelse(EDUC < 5 & EDUC >= 3, 1,
-                              ifelse(EDUC < 3, 0, 0))))) %>%
-
-    #EXTRACT DATA FROM DATABASE USING collect()
-  collect %>%
-    #CLEAN DATA EXTRACTED FROM DATABASE
-  mutate(#map abbreviation
-   EDUC = plyr::mapvalues(EDUC, 0:3, c("Less than middle school education",
-                                        "Some high school education",
-                                        "High school education",
-                                        "College education"))
- ) %>%
-  
+temp %>%
   #MANIPULATE DATA FOR SPECIFIC GRAPH
-  arrange(EDUC) %>%
-  group_by(EDUC) %>%
-   ggplot() +
-    geom_smooth(aes(x = AGE , y = HHINCOME)) +
-  scale_size(guide = FALSE) + 
-  scale_alpha(guide = FALSE) +
-    facet_wrap(~ EDUC, scales = "free") + 
+  ggplot(aes(x = AGE , y = HHINCOME / 1000)) +
+    geom_smooth() +
+    facet_wrap(~ HHEDUC, scales = "free") + 
     theme_minimal() + 
+    theme(legend.position = "none") +
     xlab("Age") + 
-    ylab("Household Income")
-  #  scale_size(guide = FALSE) + 
-  #  scale_alpha(guide = FALSE) +
+    ylab("Household Income in thousands") +
     ggtitle("Household Income by Age, by Education") + 
-    theme(legend.position = "bottom")
+    theme(legend.position = "bottom") +
+    scale_y_continuous(labels = scales::dollar)

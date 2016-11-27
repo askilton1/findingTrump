@@ -15,3 +15,5 @@ data/*
 >>>>>>> origin/master
 *.csv
 .RData
+
+finding_trump.db-journal
