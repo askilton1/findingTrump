@@ -41,24 +41,35 @@ library(tibble)
 library(ggplot2)
 
 south %>%
-  filter(RACE != "American Indian") %>% 
+  filter(RACE != "American Indian",
+         RACE != "Other") %>% 
   group_by(STATEFIP, COUNTY, RACE) %>%
   summarise(n = n(), 
             college = mean(hh_College_Degree),
-            hispanic = mean(hh_Hispanic),
-            labor_force = mean(hh_labor_force),
             income = median(HHINCOME) / 1000) %>%
-  # ungroup %>% 
-  # arrange(n)
   ggplot(aes(x = college, y = income, size = n, alpha = 0.5, color = RACE)) +
     geom_point(stat = "identity") + 
     facet_wrap(~STATEFIP) + 
     theme_minimal() + 
-    #theme(legend.position = "none") +
     scale_y_continuous(labels = scales::dollar) +
     scale_x_continuous(labels = scales::percent) +
-    ylab("Household Income in Thousands") +
-    xlab("Percent of Households with College Degree")
+    scale_color_manual(values = c("black", "red")) +
+    labs(y = "Household Income in Thousands",
+         x = "Percent of Households With College Degree",
+         title = "Relationship Between Household Income and College Education in County-Race Groups in the South",
+         subtitle = "In most counties Whites outperform Blacks in both household income and college degree attainment.") +
+    guides(size = FALSE, alpha = FALSE) +
+    theme(legend.position = c(0.9, 0.1)) 
+    
+
+library(ineq)
+south %>% 
+  # filter(RACE == "White") %>%
+  group_by(STATEFIP, COUNTY) %>% 
+  summarise(inequality = ineq(HHINCOME, type = "Gini")) %>% 
+  ungroup %>% 
+  arrange(desc(inequality))
+  
 
 south %>% 
   filter(STATEFIP == "WV") %>% 
