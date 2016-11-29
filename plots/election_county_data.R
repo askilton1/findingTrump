@@ -232,13 +232,13 @@ election_and_county_data <- read_csv("data/clean/Pres_Election_DatA_2016i.csv") 
 
 election_and_county_data %>% 
   ggplot(aes(x = NHWA, y = vote_difference, color = victor, size = TOT_POP)) +
-  geom_point(alpha = 1/2) + 
-  theme_minimal() +
-  scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
-  scale_y_continuous(labels = scales::percent) +
-  scale_x_continuous(labels = scales::percent) +
-  scale_size_continuous(guide = FALSE) +
-  labs(x = "percent of county that is non-Hispanic White only",
-       y = "Margin of Trump lead",
-       title = "Trump does best in smaller, less diverse counties",
-       subtitle = "While large counties contain more votes, they are outweighed the large number of smaller counties")
+    geom_point(alpha = 1/2) + 
+    theme_minimal() +
+    scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_size_continuous(guide = FALSE) +
+    labs(x = "percent of county that is non-Hispanic White only",
+         y = "Margin of Trump lead",
+         title = "Trump does best in smaller, less diverse counties",
+         subtitle = "While large counties contain more votes, they are outweighed the large number of smaller counties")
