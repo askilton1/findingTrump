@@ -226,8 +226,6 @@ county_data <- read_csv("data/clean/CC-EST2015-ALLDATA.csv") %>%
 
 election_and_county_data <- read_csv("data/clean/Pres_Election_DatA_2016i.csv") %>% 
   select(STATEFIPS, COUNTY, Trump, Clinton) %>% 
-  mutate(vote_difference = Trump - Clinton,
-         victor = ifelse(vote_difference > 0, "Trump", "Clinton")) %>% 
   inner_join(county_data, by = c("STATEFIPS", "COUNTY"))
 
 election_and_county_data %>% 
