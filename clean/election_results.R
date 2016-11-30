@@ -22,5 +22,7 @@ read_csv("data/raw/Pres_Election_Data_2016i.csv",
          STATEFIPS = ST) %>% 
   mutate_at(3:4, funs(as.numeric(gsub("%", "", .))/100)) %>% 
   na.omit %>% 
-  mutate(COUNTY = as.numeric(substrRight(COUNTY, 3))) %>% 
+  mutate(COUNTY = as.numeric(substrRight(COUNTY, 3)),
+         vote_difference = Trump - Clinton,
+         victor = ifelse(vote_difference > 0, "Trump", "Clinton")) %>% 
   write_csv("data/clean/Pres_Election_DatA_2016i.csv", na = "")

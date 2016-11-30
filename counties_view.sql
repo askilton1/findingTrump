@@ -1,4 +1,4 @@
---create view census_counties as
+alter view census_counties as
 select a.*, d.white_percent_in_college_hhold, e.nonwhite_percent_in_college_hhold
 from election_data a
 inner join 
@@ -21,3 +21,5 @@ inner join
 	where RACE != 1
 	group by c.STATEFIP, c.COUNTY) e
 on e.STATEFIP = d.STATEFIP and e.COUNTY = d.COUNTY
+
+select * from census_counties
