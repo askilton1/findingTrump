@@ -1,0 +1,71 @@
+---
+title: "R Notebook"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+##The Data
+
+####The election data
+At the time that I am writing this, the count has yet to be certified in a number of states. As a result, the data I am using is from US Election Atlas, which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
+```{r, echo=F, message=F}
+library(tidyverse)
+```
+
+```{r, message=F, warning=F}
+read_csv("data/clean/Pres_Election_Data_2016i.csv")
+```
+
+####Other county level data
+There are county level datasets available for free from a variety of government sources. These were cleaned in R (HYPERLINK) then uploaded to SQL Server for further cleaning and data mining.
+
+County Density:
+```{r, message=F}
+read_csv("data/raw/county_density.csv", skip = 1, 
+         col_types = cols_only(`Target Geo Id` = col_character(),
+                               `Density per square mile of land area - Population` = col_double())) %>% 
+  filter(nchar(`Target Geo Id`) == 14) %>% 
+  transmute(STATEFIPS = as.numeric(substr(`Target Geo Id`, start = 10, stop = 11)),
+            COUNTY = as.numeric(substr(`Target Geo Id`, start = 12, stop = 14)),
+            people_per_sq_mile = `Density per square mile of land area - Population`)
+```
+
+
+Affordable Care Act change in uninsured rates [from Enroll America](https://www.enrollamerica.org/research-maps/maps/changes-in-uninsured-rates-by-county/):
+```{r}
+read_csv("data/raw/County_Data_2016_health_insurance.csv",
+         col_types = list(county_fips = col_character())) %>% 
+  setNames(gsub(pattern = " ", replacement = "_", names(.))) %>% 
+  transmute(STATEFIPS = as.numeric(substr(county_fips, start = 1, stop = 2)),
+            #they messed up the state part of the county fip
+            STATEFIPS = as.numeric(
+              ifelse(STATEFIPS %in% state_abbrev, 
+                     plyr::mapvalues(x = state_abbrev, 
+                                     from = c("AL", "AK", "AZ", "AR", "CA",
+                                              "CO", "CT", "DE", "DC", "FL"), 
+                                     to = 1:10), STATEFIPS)),
+            COUNTY = as.numeric(substr(county_fips, start = 3, stop = 5)),
+            `2013_uninsured_rate`,
+            `2016_uninsured_rate`,
+            decrease_from_2013_to_2016) %>% 
+  rename(change = decrease_from_2013_to_2016)
+```
+
+Male suicide rates from [CDC mortality data](https://wonder.cdc.gov/cmf-ICD10.html):
+```{r, message=F, warning=F}
+read_tsv("data/raw/Compressed Mortality, 1999-2014.txt",
+         col_types = list(`County Code` = col_character())) %>%
+  setNames(gsub(pattern = " ", replacement = "", names(.))) %>% 
+  arrange(CountyCode, desc(Year)) %>% 
+  group_by(CountyCode) %>% 
+  slice(1) %>% 
+  transmute(STATEFIPS = as.numeric(substr(CountyCode, start = 1, stop = 2)),
+            COUNTY = as.numeric(substr(CountyCode, start = 3, stop = 5)),
+            maleSuicidesPer100k = as.numeric(substr(CrudeRate, start = 1, stop = 4)) / 100)
+```
+
+```{r}
+
+```
+
