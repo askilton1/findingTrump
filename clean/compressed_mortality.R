@@ -7,7 +7,6 @@ read_tsv("data/raw/Compressed Mortality, 1999-2014.txt",
   arrange(CountyCode, desc(Year)) %>% 
   group_by(CountyCode) %>% 
   slice(1) %>% 
-  ungroup %>% 
   transmute(STATEFIPS = as.numeric(substr(CountyCode, start = 1, stop = 2)),
             COUNTY = as.numeric(substr(CountyCode, start = 3, stop = 5)),
             maleSuicidesPer100k = as.numeric(substr(CrudeRate, start = 1, stop = 4)) / 100) %>% 
