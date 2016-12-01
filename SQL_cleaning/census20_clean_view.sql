@@ -39,9 +39,5 @@ as
 			case
 				when EMPSTAT != 3 then 1
 				else 0
-			end as in_labor_force,
-			case
-				when EMPSTAT = 3 and SEX = 1 and AGE >= 18 then 1
-				else 0 
-			end as adult_men_not_in_labor_force
+			end as employed
 	from census
