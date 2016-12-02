@@ -87,7 +87,11 @@ read_csv("data/raw/CC-EST2015-ALLDATA.csv",
             NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP))
 ```
 
+I join these datasets:
+(note! we lost quite a few counties because Alaska counts votes in "Election Districts", which do not line up with counties.)
 ```{r, message=FALSE, warning=FALSE}
-
+read_csv("data/clean/Pres_Election_DatA_2016i.csv") %>% 
+  inner_join(read_csv("data/clean/Unemployment.csv")) %>% 
+  inner_join(read_csv("data/clean/CC-EST2015-ALLDATA.csv")) %>%
+  inner_join(read_csv("data/clean/County_Data_2016_health_insurance.csv"))
 ```
-
