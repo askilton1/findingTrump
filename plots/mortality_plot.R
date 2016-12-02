@@ -1,8 +1,7 @@
 library(tidyverse)
 mortality <- read_tsv("data/clean/Compressed Mortality, 1999-2014.txt")
 
-unemployment <- read_csv("data/clean/Unemployment.csv") %>% 
-  mutate(Unemployment_rate_2015 = Unemployment_rate_2015 / 100)
+unemployment <- read_csv("data/clean/Unemployment.csv") 
 
 election <- read_csv("data/clean/Pres_Election_DatA_2016i.csv")
 
