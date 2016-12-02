@@ -9,7 +9,6 @@ read_csv("data/raw/Pres_Election_Data_2016i.csv",
                                Clinton = col_character(),
                                Trump = col_character(),
                                LSAD_TRANS = col_character())) %>% 
-  select(-LSAD_TRANS) %>% 
   filter(LSAD_TRANS %in% c("Parish", "County")) %>%
   slice(-1) %>% 
   rename(county_name = X1, 
