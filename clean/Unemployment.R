@@ -8,4 +8,5 @@ read_csv("data/raw/Unemployment.csv", skip = 6,
             COUNTY = as.numeric(substr(FIPS_Code, 3, 5)),
             Unemployment_rate_2015 = Unemployment_rate_2015 / 100,
             Median_Household_Income_2014) %>%
+  filter(COUNTY != 0) %>% 
   write_csv("data/clean/Unemployment.csv")

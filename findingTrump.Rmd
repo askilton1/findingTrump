@@ -54,6 +54,7 @@ read_csv("data/raw/County_Data_2016_health_insurance.csv",
 
 
 Economic data from the [USDA](https://www.ers.usda.gov/topics/rural-economy-population/rural-classifications.aspx).
+
 ```{r}
 read_csv("data/raw/Unemployment.csv", skip = 6, 
          col_types = cols_only(FIPS_Code = col_character(),
@@ -63,10 +64,12 @@ read_csv("data/raw/Unemployment.csv", skip = 6,
             COUNTY = as.numeric(substr(FIPS_Code, 3, 5)),
             Unemployment_rate_2015 = Unemployment_rate_2015 / 100,
             Median_Household_Income_2014)
+  filter(COUNTY != 0) %>% 
 ```
 
-
 County characteristics dataset from the [Census](https://www.census.gov/popest/data/counties/asrh/2015/CC-EST2015-ALLDATA.html):
+
+
 ```{r}
 read_csv("data/raw/CC-EST2015-ALLDATA.csv",
          col_types = cols_only(STATE = col_integer(),
@@ -84,7 +87,7 @@ read_csv("data/raw/CC-EST2015-ALLDATA.csv",
             NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP))
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 
 ```
 
