@@ -52,19 +52,6 @@ read_csv("data/raw/County_Data_2016_health_insurance.csv",
   rename(change = decrease_from_2013_to_2016)
 ```
 
-Male suicide rates from [CDC mortality data](https://wonder.cdc.gov/cmf-ICD10.html):
-```{r, message=F, warning=F}
-read_tsv("data/raw/Compressed Mortality, 1999-2014.txt",
-         col_types = cols(`County Code` = col_character()),
-         n_max = 9665) %>%
-  setNames(gsub(pattern = " ", replacement = "", names(.))) %>% 
-  arrange(CountyCode, desc(Year)) %>% 
-  group_by(CountyCode) %>% 
-  slice(1) %>% ungroup %>% 
-  transmute(STATEFIPS = as.numeric(substr(CountyCode, start = 1, stop = 2)),
-            COUNTY = as.numeric(substr(CountyCode, start = 3, stop = 5)),
-            maleSuicidesPer100k = as.numeric(substr(CrudeRate, start = 1, stop = 4)) / 100)
-```
 
 Economic data from the [USDA](https://www.ers.usda.gov/topics/rural-economy-population/rural-classifications.aspx).
 ```{r}
