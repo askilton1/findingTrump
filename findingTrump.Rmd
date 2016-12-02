@@ -8,7 +8,7 @@ output:
 ##The Data
 
 ####The election data
-At the time that I am writing this, the count has yet to be certified in a number of states. As a result, the data I am using is from US Election Atlas, which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
+The data I am using is from US Election Atlas, which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
 ```{r, echo=T, message=F}
 library(tidyverse)
 ```
@@ -16,8 +16,30 @@ library(tidyverse)
 ```{r, message=F, warning=F, eval=T}
 election <- read_csv("data/clean/Pres_Election_Data_2016i.csv", col_types = cols())
 ```
+
+"Margin" represents the margin of victory with which Donald Trump won a particular county. A positive value corresponds to a Trump victory, a negative value corresponds to a Clinton victory.
 ```{r, echo = F}
 election
+```
+
+```{r}
+ggplot(election, aes(x = abs(vote_difference))) +
+  geom_histogram() + 
+  scale_x_continuous(labels = scales::percent) +
+  labs(title = "Histogram of Absolute Margins",
+       subtitle = "The majority of counties were not competitive",
+       x = "Absolute margin between Trump and Clinton") +
+  theme_minimal()
+```
+
+```{r}
+ggplot(election, aes(x = vote_difference, fill = victor)) +
+  geom_histogram() + 
+  scale_x_continuous(labels = scales::percent) +
+  labs(title = "Histogram of Trump Margin of Victory",
+       subtitle = "Most counties where Trump won were landslides. The opposite is true for Clinton.",
+       x = "Trump margin of victory") +
+  theme_minimal()
 ```
 
 
@@ -120,9 +142,3 @@ joined_data <- election %>%
 ```{r, echo=F, message=FALSE, warning=FALSE}
 joined_data
 ```
-
-
-```{r}
-
-```
-
