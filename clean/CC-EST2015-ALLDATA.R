@@ -12,5 +12,6 @@ read_csv("data/raw/CC-EST2015-ALLDATA.csv",
          YEAR == 8) %>% 
   rename(STATEFIPS = STATE) %>%
   group_by(STATEFIPS, COUNTY) %>% 
-  summarise(NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP)) %>% 
+  summarise(TOT_POP = sum(TOT_POP),
+            NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP)) %>% 
   write_csv("data/clean/CC-EST2015-ALLDATA.csv")
