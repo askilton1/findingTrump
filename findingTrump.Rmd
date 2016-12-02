@@ -9,20 +9,24 @@ output:
 
 ####The election data
 At the time that I am writing this, the count has yet to be certified in a number of states. As a result, the data I am using is from US Election Atlas, which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
-```{r, echo=F, message=F}
+```{r, echo=T, message=F}
 library(tidyverse)
 ```
 
-```{r, message=F, warning=F}
-read_csv("data/clean/Pres_Election_Data_2016i.csv", col_types = cols())
+```{r, message=F, warning=F, eval=T}
+election <- read_csv("data/clean/Pres_Election_Data_2016i.csv", col_types = cols())
 ```
+```{r, echo = F}
+election
+```
+
 
 ####Other county level data
 There are county level datasets available for free from a variety of government sources. These were cleaned in R (HYPERLINK) then uploaded to SQL Server for further cleaning and data mining.
 
 County Density:
 ```{r, message=F, warning=FALSE}
-read_csv("data/raw/county_density.csv", skip = 1, 
+density <- read_csv("data/raw/county_density.csv", skip = 1, 
          col_types = cols_only(`Target Geo Id` = col_character(),
                                `Density per square mile of land area - Population` = col_double())) %>% 
   filter(nchar(`Target Geo Id`) == 14) %>% 
@@ -31,10 +35,14 @@ read_csv("data/raw/county_density.csv", skip = 1,
             people_per_sq_mile = `Density per square mile of land area - Population`)
 ```
 
+```{r, echo=F, message=FALSE, warning=F}
+density
+```
+
 
 Affordable Care Act change in uninsured rates [from Enroll America](https://www.enrollamerica.org/research-maps/maps/changes-in-uninsured-rates-by-county/):
 ```{r}
-read_csv("data/raw/County_Data_2016_health_insurance.csv",
+insurance <- read_csv("data/raw/County_Data_2016_health_insurance.csv",
          col_types = list(county_fips = col_character())) %>% 
   setNames(gsub(pattern = " ", replacement = "_", names(.))) %>% 
   transmute(STATEFIPS = as.numeric(substr(county_fips, start = 1, stop = 2)),
@@ -52,11 +60,15 @@ read_csv("data/raw/County_Data_2016_health_insurance.csv",
   rename(change = decrease_from_2013_to_2016)
 ```
 
+```{r, echo=F}
+insurance
+```
+
 
 Economic data from the [USDA](https://www.ers.usda.gov/topics/rural-economy-population/rural-classifications.aspx).
 
 ```{r}
-read_csv("data/raw/Unemployment.csv", skip = 6, 
+econ <- read_csv("data/raw/Unemployment.csv", skip = 6, 
          col_types = cols_only(FIPS_Code = col_character(),
                                Unemployment_rate_2015 = col_double(),
                                Median_Household_Income_2014 = col_number())) %>% 
@@ -66,12 +78,16 @@ read_csv("data/raw/Unemployment.csv", skip = 6,
             Median_Household_Income_2014) %>% 
   filter(COUNTY != 0) 
 ```
+```{r, echo=F}
+econ
+```
+
 
 County characteristics dataset from the [Census](https://www.census.gov/popest/data/counties/asrh/2015/CC-EST2015-ALLDATA.html):
 
 
 ```{r}
-read_csv("data/raw/CC-EST2015-ALLDATA.csv",
+NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
          col_types = cols_only(STATE = col_integer(),
                                COUNTY = col_integer(),
                                TOT_POP = col_integer(),
@@ -87,11 +103,26 @@ read_csv("data/raw/CC-EST2015-ALLDATA.csv",
             NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP))
 ```
 
+```{r, echo=F}
+NHWA
+```
+
+
 I join these datasets:
 (note! we lost quite a few counties because Alaska counts votes in "Election Districts", which do not line up with counties.)
 ```{r, message=FALSE, warning=FALSE}
-read_csv("data/clean/Pres_Election_DatA_2016i.csv") %>% 
-  inner_join(read_csv("data/clean/Unemployment.csv")) %>% 
-  inner_join(read_csv("data/clean/CC-EST2015-ALLDATA.csv")) %>%
-  inner_join(read_csv("data/clean/County_Data_2016_health_insurance.csv"))
+joined_data <- election %>% 
+  inner_join(density) %>% 
+  inner_join(insurance) %>% 
+  inner_join(econ)
 ```
+
+```{r, echo=F, message=FALSE, warning=FALSE}
+joined_data
+```
+
+
+```{r}
+
+```
+
