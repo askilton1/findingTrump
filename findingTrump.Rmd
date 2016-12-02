@@ -129,7 +129,6 @@ NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
 NHWA
 ```
 
-
 I join these datasets:
 (note! we lost quite a few counties because Alaska counts votes in "Election Districts", which do not line up with counties.)
 ```{r, message=FALSE, warning=FALSE}
@@ -141,4 +140,12 @@ joined_data <- election %>%
 
 ```{r, echo=F, message=FALSE, warning=FALSE}
 joined_data
+```
+
+```{r}
+joined_data %>%
+  gather(key, value, people_per_sq_mile:Median_Household_Income_2014) %>% 
+  ggplot(aes(x = value)) +
+    geom_histogram() +
+    facet_wrap(~key, scales = "free")
 ```
