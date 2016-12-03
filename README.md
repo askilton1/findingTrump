@@ -1,29 +1,36 @@
----
-title: "Technical Appendix"
-author: "Antonio Skilton"
-output:
-  md_document:
-    variant: markdown_github
----
+The Data
+--------
 
-##The Data
+#### The election data
 
-####The election data
 The data I am using is from US Election Atlas, which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
-```{r, echo=T, message=F, warning=FALSE}
+
+``` r
 library(tidyverse)
 ```
 
-```{r, message=F, warning=F, eval=T}
+``` r
 election <- read_csv("data/clean/Pres_Election_Data_2016i.csv", col_types = cols())
 ```
 
 "Margin" represents the margin of victory with which Donald Trump won a particular county. A positive value corresponds to a Trump victory, a negative value corresponds to a Clinton victory.
-```{r, echo = F}
-election
-```
 
-```{r}
+    ## # A tibble: 3,026 × 4
+    ##    STATEFIPS COUNTY vote_difference  victor
+    ##        <int>  <dbl>           <dbl>   <chr>
+    ## 1          1      3          0.5721   Trump
+    ## 2          1      5          0.0560   Trump
+    ## 3          1      7          0.5513   Trump
+    ## 4          1      9          0.8092   Trump
+    ## 5          1     11         -0.5077 Clinton
+    ## 6          1     13          0.1349   Trump
+    ## 7          1     15          0.4105   Trump
+    ## 8          1     17          0.1474   Trump
+    ## 9          1     19          0.6899   Trump
+    ## 10         1     21          0.6626   Trump
+    ## # ... with 3,016 more rows
+
+``` r
 ggplot(election, aes(x = abs(vote_difference))) +
   geom_histogram() + 
   scale_x_continuous(labels = scales::percent) +
@@ -33,7 +40,11 @@ ggplot(election, aes(x = abs(vote_difference))) +
   theme_minimal()
 ```
 
-```{r}
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
+``` r
 ggplot(election, aes(x = vote_difference, fill = victor)) +
   geom_histogram() + 
   scale_x_continuous(labels = scales::percent) +
@@ -43,12 +54,17 @@ ggplot(election, aes(x = vote_difference, fill = victor)) +
   theme_minimal()
 ```
 
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-####Other county level data
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-5-1.png)
+
+#### Other county level data
+
 There are county level datasets available for free from a variety of government sources. These were cleaned in R (HYPERLINK) then uploaded to SQL Server for further cleaning and data mining.
 
 County Density:
-```{r, message=F, warning=FALSE}
+
+``` r
 density <- read_csv("data/raw/county_density.csv", skip = 1, 
          col_types = cols_only(`Target Geo Id` = col_character(),
                                `Density per square mile of land area - Population` = col_double())) %>% 
@@ -58,14 +74,24 @@ density <- read_csv("data/raw/county_density.csv", skip = 1,
             people_per_sq_mile = `Density per square mile of land area - Population`)
 ```
 
-```{r, echo=F, message=FALSE, warning=F}
-density %>% 
-  rename(`People per square mile` = people_per_sq_mile)
-```
-
+    ## # A tibble: 3,221 × 3
+    ##    STATEFIPS COUNTY `People per square mile`
+    ##        <dbl>  <dbl>                    <dbl>
+    ## 1          1      1                     91.8
+    ## 2          1      3                    114.6
+    ## 3          1      5                     31.0
+    ## 4          1      7                     36.8
+    ## 5          1      9                     88.9
+    ## 6          1     11                     17.5
+    ## 7          1     13                     27.0
+    ## 8          1     15                    195.7
+    ## 9          1     17                     57.4
+    ## 10         1     19                     46.9
+    ## # ... with 3,211 more rows
 
 Affordable Care Act change in uninsured rates [from Enroll America](https://www.enrollamerica.org/research-maps/maps/changes-in-uninsured-rates-by-county/):
-```{r}
+
+``` r
 insurance <- read_csv("data/raw/County_Data_2016_health_insurance.csv",
          col_types = list(county_fips = col_character())) %>% 
   setNames(gsub(pattern = " ", replacement = "_", names(.))) %>% 
@@ -80,16 +106,24 @@ insurance <- read_csv("data/raw/County_Data_2016_health_insurance.csv",
   arrange(STATEFIPS, COUNTY)
 ```
 
-```{r, echo=F}
-insurance %>% 
-  rename(`Rate Uninsured in 2013` = uninsured_rate_2013,
-         `Rate Uninsured in 2016` = uninsured_rate_2016)
-```
-
+    ## # A tibble: 3,238 × 5
+    ##    STATEFIPS COUNTY `Rate Uninsured in 2013` `Rate Uninsured in 2016`
+    ##        <dbl>  <dbl>                    <dbl>                    <dbl>
+    ## 1          1      1                     0.17                     0.08
+    ## 2          1      3                     0.17                     0.08
+    ## 3          1      5                     0.24                     0.15
+    ## 4          1      7                     0.20                     0.10
+    ## 5          1      9                     0.19                     0.10
+    ## 6          1     11                     0.28                     0.17
+    ## 7          1     13                     0.24                     0.14
+    ## 8          1     15                     0.21                     0.11
+    ## 9          1     17                     0.25                     0.13
+    ## 10         1     19                     0.22                     0.10
+    ## # ... with 3,228 more rows, and 1 more variables: change <dbl>
 
 Economic data from the [USDA](https://www.ers.usda.gov/topics/rural-economy-population/rural-classifications.aspx).
 
-```{r}
+``` r
 econ <- read_csv("data/raw/Unemployment.csv", skip = 6, 
          col_types = cols_only(FIPS_Code = col_character(),
                                Unemployment_rate_2015 = col_double(),
@@ -100,15 +134,26 @@ econ <- read_csv("data/raw/Unemployment.csv", skip = 6,
             Median_Household_Income_2014) %>% 
   filter(COUNTY != 0) 
 ```
-```{r, echo=F}
-econ %>% 
-  rename(`Unemployment rate in 2015` = Unemployment_rate_2015,
-         `Median household income in 2014` = Median_Household_Income_2014)
-```
 
+    ## # A tibble: 3,223 × 4
+    ##    STATEFIPS COUNTY `Unemployment rate in 2015`
+    ##        <dbl>  <dbl>                       <dbl>
+    ## 1          1      1                       0.052
+    ## 2          1      3                       0.055
+    ## 3          1      5                       0.089
+    ## 4          1      7                       0.066
+    ## 5          1      9                       0.054
+    ## 6          1     11                       0.078
+    ## 7          1     13                       0.075
+    ## 8          1     15                       0.070
+    ## 9          1     17                       0.060
+    ## 10         1     19                       0.054
+    ## # ... with 3,213 more rows, and 1 more variables: `Median household income
+    ## #   in 2014` <dbl>
 
 County characteristics dataset from the [Census](https://www.census.gov/popest/data/counties/asrh/2015/CC-EST2015-ALLDATA.html):
-```{r, message=FALSE, warning=FALSE}
+
+``` r
 NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
          col_types = cols_only(STATE = col_integer(),
                                COUNTY = col_integer(),
@@ -126,15 +171,27 @@ NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
             NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP))
 ```
 
-```{r, echo=F}
-NHWA %>% 
-  rename(`Total Population (TOT_POP)` = TOT_POP,
-         `Non-Hispanic White Alone (NHWA)` = NHWA)
-```
-
+    ## Source: local data frame [3,142 x 4]
+    ## Groups: STATEFIPS [51]
+    ## 
+    ##    STATEFIPS COUNTY `Total Population (TOT_POP)`
+    ##        <int>  <int>                        <int>
+    ## 1          1      1                        40372
+    ## 2          1      3                       154649
+    ## 3          1      5                        20379
+    ## 4          1      7                        17438
+    ## 5          1      9                        43050
+    ## 6          1     11                         8254
+    ## 7          1     13                        14962
+    ## 8          1     15                        87046
+    ## 9          1     17                        26147
+    ## 10         1     19                        20156
+    ## # ... with 3,132 more rows, and 1 more variables: `Non-Hispanic White
+    ## #   Alone (NHWA)` <dbl>
 
 I join these datasets:
-```{r, message=FALSE, warning=FALSE}
+
+``` r
 joined_data <- election %>% 
   inner_join(density) %>% 
   inner_join(insurance) %>% 
@@ -142,11 +199,25 @@ joined_data <- election %>%
   inner_join(NHWA)
 ```
 
-```{r, echo=F, message=FALSE, warning=FALSE}
-joined_data
-```
+    ## # A tibble: 3,028 × 12
+    ##    STATEFIPS COUNTY vote_difference  victor people_per_sq_mile
+    ##        <dbl>  <dbl>           <dbl>   <chr>              <dbl>
+    ## 1          1      3          0.5721   Trump              114.6
+    ## 2          1      5          0.0560   Trump               31.0
+    ## 3          1      7          0.5513   Trump               36.8
+    ## 4          1      9          0.8092   Trump               88.9
+    ## 5          1     11         -0.5077 Clinton               17.5
+    ## 6          1     13          0.1349   Trump               27.0
+    ## 7          1     15          0.4105   Trump              195.7
+    ## 8          1     17          0.1474   Trump               57.4
+    ## 9          1     19          0.6899   Trump               46.9
+    ## 10         1     21          0.6626   Trump               63.0
+    ## # ... with 3,018 more rows, and 7 more variables:
+    ## #   uninsured_rate_2013 <dbl>, uninsured_rate_2016 <dbl>, change <dbl>,
+    ## #   Unemployment_rate_2015 <dbl>, Median_Household_Income_2014 <dbl>,
+    ## #   TOT_POP <int>, NHWA <dbl>
 
-```{r, fig.width=10}
+``` r
 joined_data %>%
   gather(key, value, people_per_sq_mile:NHWA) %>% 
   ggplot(aes(x = value)) +
@@ -155,46 +226,13 @@ joined_data %>%
     theme_minimal()
 ```
 
-```{r, echo=F}
-rankedCorrelations <- function(data){
-  library(tidyverse)
-  data %>%
-    gather_(data = ., key_col = "key", value_col = "value", gather_cols = names(.)[sapply(., is.character)]) %>%
-    rownames_to_column() %>%
-    mutate(spreadValue = 1) %>%
-    unite(comb, key, value) %>%
-    spread(comb, spreadValue, fill = 0) %>%
-    select(-rowname) %>%
-    cor %>%
-    data.frame %>%
-    rownames_to_column(var = "Vars1") %>% 
-    tbl_df %>%
-    gather(key = "Vars2", value = "correlation", -Vars1) %>%
-    mutate(Vars1 = gsub("_","~",Vars1),
-           Vars1 = ifelse(grepl("_", Vars1), Vars1, paste0(Vars1, "_", Vars1)),
-           Vars2 = gsub("_","~",Vars2),
-           Vars2 = ifelse(grepl("_", Vars2), Vars2, paste0(Vars2, "_", Vars2))) %>%
-    separate(Vars1, into = c("Vars1_category", "Vars1"), sep = "_") %>%
-    separate(Vars2, into = c("Vars2_category", "Vars2"), sep = "_") %>%
-    mutate_at(vars(contains("Var")), funs(gsub("~","_",.))) %>% 
-    filter(Vars1 != Vars2,
-           Vars1_category != Vars2_category,
-           !is.na(correlation)) %>%
-    mutate(Vars1_category = ifelse(Vars1_category == Vars1, "", Vars1_category),
-           Vars2_category = ifelse(Vars2_category == Vars2, "", Vars2_category)) %>%
-    #order by the absolute value of correlation
-    group_by(abs(correlation)) %>% 
-    slice(1) %>% 
-    arrange(desc(abs(correlation))) %>% 
-    ungroup %>% 
-    select(-`abs(correlation)`) %>% 
-    return
-}
-```
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
-The "vote_difference" variable is of greatest interest here. The following correlations show us which variables are most related to the election outcomes per county.
-```{r, fig.height=5}
+The "vote\_difference" variable is of greatest interest here. The following correlations show us which variables are most related to the election outcomes per county.
+
+``` r
 library(forcats)
 
 joined_data %>% 
@@ -214,8 +252,12 @@ joined_data %>%
          x = "Variable pairs")
 ```
 
-#Relationships
-```{r, fig.width=10}
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+Relationships
+=============
+
+``` r
 joined_data %>% 
   ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor)) + 
     geom_point(alpha = 1/5) + 
@@ -229,7 +271,9 @@ joined_data %>%
          y = "Margin of Trump lead")
 ```
 
-```{r, fig.width=10, message=FALSE, warning=FALSE}
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-19-1.png)
+
+``` r
 joined_data %>% 
   ggplot(aes(x = TOT_POP / 1000, fill = victor)) + 
     geom_histogram(bins = 75) + 
@@ -242,7 +286,9 @@ joined_data %>%
          x = "Total population in thousands")
 ```
 
-```{r, fig.width=10}
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-20-1.png)
+
+``` r
 joined_data %>% 
   ggplot(aes(x = Unemployment_rate_2015, y = vote_difference, size = TOT_POP, color = victor)) + 
     geom_point(alpha = 1/5) + 
@@ -260,8 +306,11 @@ joined_data %>%
          y = "Margin of Trump lead")
 ```
 
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-21-1.png)
+
 To detect multicolinearity, we show correlations between independent variables.
-```{r, fig.height=8}
+
+``` r
 joined_data %>% 
   rankedCorrelations() %>% 
   filter(Vars1 != "vote_difference" & Vars2 != "vote_difference") %>% 
@@ -279,8 +328,9 @@ joined_data %>%
          x = "Variable pairs")
 ```
 
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-22-1.png)
 
-```{r, fig.width=10}
+``` r
 joined_data %>% 
   ggplot(aes(x = Median_Household_Income_2014, y = uninsured_rate_2013, size = TOT_POP)) + 
     geom_point(alpha = 1/5) + 
@@ -290,9 +340,31 @@ joined_data %>%
     scale_size(guide = F)
 ```
 
-#Random Forest Time
-```{r}
+![](findingTrump_files/figure-markdown_github/unnamed-chunk-23-1.png)
+
+Random Forest Time
+==================
+
+``` r
 library(randomForest)
+```
+
+    ## randomForest 4.6-12
+
+    ## Type rfNews() to see new features/changes/bug fixes.
+
+    ## 
+    ## Attaching package: 'randomForest'
+
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     combine
+
+    ## The following object is masked from 'package:ggplot2':
+    ## 
+    ##     margin
+
+``` r
 sample_data <- (joined_data)
 data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
                         y = joined_data$vote_difference,
@@ -301,4 +373,16 @@ imp <- importance(data.rf, 1)[order(importance(data.rf, 1), decreasing = T),]
 tibble(Variable = names(imp),`%Increase in MSE` = round(imp, 2) / 100)
 ```
 
-
+    ## # A tibble: 10 × 2
+    ##                        Variable `%Increase in MSE`
+    ##                           <chr>              <dbl>
+    ## 1                          NHWA             1.0064
+    ## 2                     STATEFIPS             0.5414
+    ## 3           uninsured_rate_2016             0.5147
+    ## 4                       TOT_POP             0.5057
+    ## 5        Unemployment_rate_2015             0.4340
+    ## 6           uninsured_rate_2013             0.4003
+    ## 7  Median_Household_Income_2014             0.3863
+    ## 8            people_per_sq_mile             0.3637
+    ## 9                        change             0.3333
+    ## 10                       COUNTY             0.2212
