@@ -1,0 +1,291 @@
+---
+title: "Technical Appendix"
+author: "Antonio Skilton"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+##The Data
+
+####The election data
+The data I am using is from US Election Atlas, which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
+```{r, echo=T, message=F, warning=FALSE}
+library(tidyverse)
+```
+
+```{r, message=F, warning=F, eval=T}
+election <- read_csv("data/clean/Pres_Election_Data_2016i.csv", col_types = cols())
+```
+
+"Margin" represents the margin of victory with which Donald Trump won a particular county. A positive value corresponds to a Trump victory, a negative value corresponds to a Clinton victory.
+```{r, echo = F}
+election
+```
+
+```{r}
+ggplot(election, aes(x = abs(vote_difference))) +
+  geom_histogram() + 
+  scale_x_continuous(labels = scales::percent) +
+  labs(title = "Histogram of Absolute Margins",
+       subtitle = "The majority of counties were not competitive",
+       x = "Absolute margin between Trump and Clinton") +
+  theme_minimal()
+```
+
+```{r}
+ggplot(election, aes(x = vote_difference, fill = victor)) +
+  geom_histogram() + 
+  scale_x_continuous(labels = scales::percent) +
+  labs(title = "Histogram of Trump Margin of Victory",
+       subtitle = "Most counties where Trump won were landslides. The opposite is true for Clinton.",
+       x = "Trump margin of victory") +
+  theme_minimal()
+```
+
+
+####Other county level data
+There are county level datasets available for free from a variety of government sources. These were cleaned in R (HYPERLINK) then uploaded to SQL Server for further cleaning and data mining.
+
+County Density:
+```{r, message=F, warning=FALSE}
+density <- read_csv("data/raw/county_density.csv", skip = 1, 
+         col_types = cols_only(`Target Geo Id` = col_character(),
+                               `Density per square mile of land area - Population` = col_double())) %>% 
+  filter(nchar(`Target Geo Id`) == 14) %>% 
+  transmute(STATEFIPS = as.numeric(substr(`Target Geo Id`, start = 10, stop = 11)),
+            COUNTY = as.numeric(substr(`Target Geo Id`, start = 12, stop = 14)),
+            people_per_sq_mile = `Density per square mile of land area - Population`)
+```
+
+```{r, echo=F, message=FALSE, warning=F}
+density %>% 
+  rename(`People per square mile` = people_per_sq_mile)
+```
+
+
+Affordable Care Act change in uninsured rates [from Enroll America](https://www.enrollamerica.org/research-maps/maps/changes-in-uninsured-rates-by-county/):
+```{r}
+insurance <- read_csv("data/raw/County_Data_2016_health_insurance.csv",
+         col_types = list(county_fips = col_character())) %>% 
+  setNames(gsub(pattern = " ", replacement = "_", names(.))) %>% 
+  transmute(STATEFIPS = ifelse(nchar(county_fips) == 5,
+                               as.numeric(substr(county_fips, start = 1, stop = 2)),
+                               as.numeric(substr(county_fips, start = 1, stop = 1))),
+                               COUNTY = as.numeric(substr(county_fips, start = nchar(county_fips) - 2, stop = nchar(county_fips))),
+                               uninsured_rate_2013 = `2013_uninsured_rate` / 100,
+                               uninsured_rate_2016 = `2016_uninsured_rate` / 100,
+                               decrease_from_2013_to_2016 = decrease_from_2013_to_2016 / 100) %>% 
+  rename(change = decrease_from_2013_to_2016) %>% 
+  arrange(STATEFIPS, COUNTY)
+```
+
+```{r, echo=F}
+insurance %>% 
+  rename(`Rate Uninsured in 2013` = uninsured_rate_2013,
+         `Rate Uninsured in 2016` = uninsured_rate_2016)
+```
+
+
+Economic data from the [USDA](https://www.ers.usda.gov/topics/rural-economy-population/rural-classifications.aspx).
+
+```{r}
+econ <- read_csv("data/raw/Unemployment.csv", skip = 6, 
+         col_types = cols_only(FIPS_Code = col_character(),
+                               Unemployment_rate_2015 = col_double(),
+                               Median_Household_Income_2014 = col_number())) %>% 
+  transmute(STATEFIPS = as.numeric(substr(FIPS_Code, 1, 2)),
+            COUNTY = as.numeric(substr(FIPS_Code, 3, 5)),
+            Unemployment_rate_2015 = Unemployment_rate_2015 / 100,
+            Median_Household_Income_2014) %>% 
+  filter(COUNTY != 0) 
+```
+```{r, echo=F}
+econ %>% 
+  rename(`Unemployment rate in 2015` = Unemployment_rate_2015,
+         `Median household income in 2014` = Median_Household_Income_2014)
+```
+
+
+County characteristics dataset from the [Census](https://www.census.gov/popest/data/counties/asrh/2015/CC-EST2015-ALLDATA.html):
+```{r, message=FALSE, warning=FALSE}
+NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
+         col_types = cols_only(STATE = col_integer(),
+                               COUNTY = col_integer(),
+                               TOT_POP = col_integer(),
+                               AGEGRP = col_integer(),
+                               YEAR = col_integer(),
+                               NHWA_MALE = col_integer(),
+                               NHWA_FEMALE = col_integer()),
+         progress = F) %>% 
+  filter(AGEGRP >= 5,
+         YEAR == 8) %>% 
+  rename(STATEFIPS = STATE) %>%
+  group_by(STATEFIPS, COUNTY) %>% 
+  summarise(TOT_POP = sum(TOT_POP),
+            NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP))
+```
+
+```{r, echo=F}
+NHWA %>% 
+  rename(`Total Population (TOT_POP)` = TOT_POP,
+         `Non-Hispanic White Alone (NHWA)` = NHWA)
+```
+
+
+I join these datasets:
+```{r, message=FALSE, warning=FALSE}
+joined_data <- election %>% 
+  inner_join(density) %>% 
+  inner_join(insurance) %>% 
+  inner_join(econ) %>% 
+  inner_join(NHWA)
+```
+
+```{r, echo=F, message=FALSE, warning=FALSE}
+joined_data
+```
+
+```{r, fig.width=10}
+joined_data %>%
+  gather(key, value, people_per_sq_mile:NHWA) %>% 
+  ggplot(aes(x = value)) +
+    geom_histogram() +
+    facet_wrap(~key, scales = "free") + 
+    theme_minimal()
+```
+
+```{r, echo=F}
+rankedCorrelations <- function(data){
+  library(tidyverse)
+  data %>%
+    gather_(data = ., key_col = "key", value_col = "value", gather_cols = names(.)[sapply(., is.character)]) %>%
+    rownames_to_column() %>%
+    mutate(spreadValue = 1) %>%
+    unite(comb, key, value) %>%
+    spread(comb, spreadValue, fill = 0) %>%
+    select(-rowname) %>%
+    cor %>%
+    data.frame %>%
+    rownames_to_column(var = "Vars1") %>% 
+    tbl_df %>%
+    gather(key = "Vars2", value = "correlation", -Vars1) %>%
+    mutate(Vars1 = gsub("_","~",Vars1),
+           Vars1 = ifelse(grepl("_", Vars1), Vars1, paste0(Vars1, "_", Vars1)),
+           Vars2 = gsub("_","~",Vars2),
+           Vars2 = ifelse(grepl("_", Vars2), Vars2, paste0(Vars2, "_", Vars2))) %>%
+    separate(Vars1, into = c("Vars1_category", "Vars1"), sep = "_") %>%
+    separate(Vars2, into = c("Vars2_category", "Vars2"), sep = "_") %>%
+    mutate_at(vars(contains("Var")), funs(gsub("~","_",.))) %>% 
+    filter(Vars1 != Vars2,
+           Vars1_category != Vars2_category,
+           !is.na(correlation)) %>%
+    mutate(Vars1_category = ifelse(Vars1_category == Vars1, "", Vars1_category),
+           Vars2_category = ifelse(Vars2_category == Vars2, "", Vars2_category)) %>%
+    #order by the absolute value of correlation
+    group_by(abs(correlation)) %>% 
+    slice(1) %>% 
+    arrange(desc(abs(correlation))) %>% 
+    ungroup %>% 
+    select(-`abs(correlation)`) %>% 
+    return
+}
+```
+
+
+The "vote_difference" variable is of greatest interest here. The following correlations show us which variables are most related to the election outcomes per county.
+```{r, fig.height=5}
+library(forcats)
+
+joined_data %>% 
+  rankedCorrelations() %>% 
+  filter(Vars1 == "vote_difference" | Vars2 == "vote_difference") %>% 
+  unite(Vars, Vars1, Vars2, sep = " & ") %>% 
+  arrange(abs(correlation)) %>% 
+  mutate(Vars = fct_inorder(Vars)) %>% 
+  ggplot(aes(x = Vars, y = correlation, alpha = log(abs(correlation)))) +
+    geom_bar(stat = "identity") + 
+    coord_flip() + 
+    theme_minimal() +
+    scale_y_continuous(labels = scales::percent, limits = c(-1,1)) +
+    scale_alpha(guide = F) +
+    labs(title = "Ranked Correlations",
+         y = "Degree of correlation",
+         x = "Variable pairs")
+```
+
+#Relationships
+```{r, fig.width=10}
+joined_data %>% 
+  ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor)) + 
+    geom_point(alpha = 1/5) + 
+    theme_minimal() +
+    scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_y_continuous(labels = scales::percent) + 
+    scale_size(guide = F) +
+    labs(title = "Counties by Trump Victory Margin and Whiteness",
+         x = "Percent of county that is non-Hispanic White",
+         y = "Margin of Trump lead")
+```
+
+```{r, fig.width=10, message=FALSE, warning=FALSE}
+joined_data %>% 
+  ggplot(aes(x = TOT_POP / 1000, fill = victor)) + 
+    geom_histogram(bins = 75) + 
+    facet_wrap(~victor, scales = "free_x") +
+    theme_minimal() +
+    scale_y_log10() +
+    scale_fill_brewer(type = "qual", palette = "Set1", direction = -1) +
+    labs(title = "Distribution of County Populations",
+         subtitle = "Counties in which Trump tend to be smaller.",
+         x = "Total population in thousands")
+```
+
+```{r, fig.width=10}
+joined_data %>% 
+  ggplot(aes(x = Unemployment_rate_2015, y = vote_difference, size = TOT_POP, color = victor)) + 
+    geom_point(alpha = 1/5) + 
+    facet_wrap(~cut(people_per_sq_mile, 
+                    breaks = c(-Inf, 15, 300, Inf), 
+                    labels= c("low density", "medium density", "high density")), scales = "free_x") +
+    theme_minimal() +
+    scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_y_continuous(labels = scales::percent) + 
+    scale_size(guide = F) +
+    labs(title = "Counties by Trump Victory Margin and Whiteness",
+         subtitle = "Low density counties are more White and more pro Trump",
+         x = "Percent of county that is non-Hispanic White",
+         y = "Margin of Trump lead")
+```
+
+To detect multicolinearity, we show the correlations for 
+```{r, fig.height=8}
+joined_data %>% 
+  rankedCorrelations() %>% 
+  filter(Vars1 != "vote_difference" & Vars2 != "vote_difference") %>% 
+  unite(Vars, Vars1, Vars2, sep = " & ") %>% 
+  arrange(abs(correlation)) %>% 
+  mutate(Vars = fct_inorder(Vars)) %>% 
+  ggplot(aes(x = Vars, y = correlation, alpha = log(abs(correlation)))) +
+    geom_bar(stat = "identity") + 
+    coord_flip() + 
+    theme_minimal() +
+    scale_y_continuous(labels = scales::percent, limits = c(-1,1)) +
+    scale_alpha(guide = F) +
+    labs(title = "Ranked Correlations",
+         y = "Degree of correlation",
+         x = "Variable pairs")
+```
+`
+
+```{r, fig.width=10}
+joined_data %>% 
+  ggplot(aes(x = Median_Household_Income_2014, y = uninsured_rate_2013, size = TOT_POP)) + 
+    geom_point(alpha = 1/5) + 
+    theme_minimal() +
+    scale_x_continuous(labels = scales::dollar) + 
+    scale_y_continuous(labels = scales::percent) +
+    scale_size(guide = F)
+```
