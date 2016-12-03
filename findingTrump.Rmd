@@ -59,7 +59,8 @@ density <- read_csv("data/raw/county_density.csv", skip = 1,
 ```
 
 ```{r, echo=F, message=FALSE, warning=F}
-density
+density %>% 
+  rename(`People per square mile` = people_per_sq_mile)
 ```
 
 
@@ -80,7 +81,9 @@ insurance <- read_csv("data/raw/County_Data_2016_health_insurance.csv",
 ```
 
 ```{r, echo=F}
-insurance
+insurance %>% 
+  rename(`Rate Uninsured in 2013` = uninsured_rate_2013,
+         `Rate Uninsured in 2016` = uninsured_rate_2016)
 ```
 
 
@@ -98,7 +101,9 @@ econ <- read_csv("data/raw/Unemployment.csv", skip = 6,
   filter(COUNTY != 0) 
 ```
 ```{r, echo=F}
-econ
+econ %>% 
+  rename(`Unemployment rate in 2015` = Unemployment_rate_2015,
+         `Median household income in 2014` = Median_Household_Income_2014)
 ```
 
 
@@ -121,7 +126,9 @@ NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
 ```
 
 ```{r, echo=F}
-NHWA
+NHWA %>% 
+  rename(`Total Population (TOT_POP)` = TOT_POP,
+         `Non-Hispanic White Alone (NHWA)` = NHWA)
 ```
 
 
