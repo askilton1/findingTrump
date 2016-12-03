@@ -292,7 +292,7 @@ joined_data %>%
 
 #Random Forest Time
 ```{r, message=FALSE, warning=FALSE}
-library(randomForest)
+library(randomForest, quietly = T)
 sample_data <- (joined_data)
 data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
                         y = joined_data$vote_difference,

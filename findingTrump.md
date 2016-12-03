@@ -346,7 +346,7 @@ Random Forest Time
 ==================
 
 ``` r
-library(randomForest)
+library(randomForest, quietly = T)
 sample_data <- (joined_data)
 data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
                         y = joined_data$vote_difference,
@@ -358,13 +358,13 @@ tibble(Variable = names(imp),`%Increase in MSE` = round(imp, 2) / 100)
     ## # A tibble: 10 × 2
     ##                        Variable `%Increase in MSE`
     ##                           <chr>              <dbl>
-    ## 1                          NHWA             0.9637
-    ## 2                     STATEFIPS             0.5340
-    ## 3           uninsured_rate_2016             0.5000
-    ## 4                       TOT_POP             0.4710
-    ## 5        Unemployment_rate_2015             0.4591
-    ## 6  Median_Household_Income_2014             0.3887
-    ## 7            people_per_sq_mile             0.3787
-    ## 8           uninsured_rate_2013             0.3706
-    ## 9                        change             0.3159
-    ## 10                       COUNTY             0.2409
+    ## 1                          NHWA             0.9866
+    ## 2           uninsured_rate_2016             0.5322
+    ## 3                     STATEFIPS             0.5209
+    ## 4                       TOT_POP             0.4953
+    ## 5        Unemployment_rate_2015             0.4509
+    ## 6           uninsured_rate_2013             0.3779
+    ## 7  Median_Household_Income_2014             0.3748
+    ## 8            people_per_sq_mile             0.3625
+    ## 9                        change             0.3328
+    ## 10                       COUNTY             0.2299
