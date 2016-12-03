@@ -291,7 +291,7 @@ joined_data %>%
 ```
 
 #Random Forest Time
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(randomForest)
 sample_data <- (joined_data)
 data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
