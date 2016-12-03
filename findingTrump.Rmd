@@ -126,7 +126,6 @@ NHWA
 
 
 I join these datasets:
-(note! we lost quite a few counties because Alaska counts votes in "Election Districts", which do not line up with counties.)
 ```{r, message=FALSE, warning=FALSE}
 joined_data <- election %>% 
   inner_join(density) %>% 
