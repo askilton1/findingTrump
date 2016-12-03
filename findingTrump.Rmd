@@ -260,7 +260,7 @@ joined_data %>%
          y = "Margin of Trump lead")
 ```
 
-To detect multicolinearity, we show the correlations for 
+To detect multicolinearity, we show correlations between independent variables.
 ```{r, fig.height=8}
 joined_data %>% 
   rankedCorrelations() %>% 
@@ -278,7 +278,7 @@ joined_data %>%
          y = "Degree of correlation",
          x = "Variable pairs")
 ```
-`
+
 
 ```{r, fig.width=10}
 joined_data %>% 
@@ -289,3 +289,16 @@ joined_data %>%
     scale_y_continuous(labels = scales::percent) +
     scale_size(guide = F)
 ```
+
+#Random Forest Time
+```{r}
+library(randomForest)
+sample_data <- (joined_data)
+data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
+                        y = joined_data$vote_difference,
+                        importance = T)
+imp <- importance(data.rf, 1)[order(importance(data.rf, 1), decreasing = T),] 
+tibble(Variable = names(imp),`%Increase in MSE` = round(imp, 2) / 100)
+```
+
+
