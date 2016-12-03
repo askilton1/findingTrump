@@ -154,4 +154,138 @@ joined_data %>%
     facet_wrap(~key, scales = "free") + 
     theme_minimal()
 ```
+
+```{r, echo=F}
+rankedCorrelations <- function(data){
+  library(tidyverse)
+  data %>%
+    gather_(data = ., key_col = "key", value_col = "value", gather_cols = names(.)[sapply(., is.character)]) %>%
+    rownames_to_column() %>%
+    mutate(spreadValue = 1) %>%
+    unite(comb, key, value) %>%
+    spread(comb, spreadValue, fill = 0) %>%
+    select(-rowname) %>%
+    cor %>%
+    data.frame %>%
+    rownames_to_column(var = "Vars1") %>% 
+    tbl_df %>%
+    gather(key = "Vars2", value = "correlation", -Vars1) %>%
+    mutate(Vars1 = gsub("_","~",Vars1),
+           Vars1 = ifelse(grepl("_", Vars1), Vars1, paste0(Vars1, "_", Vars1)),
+           Vars2 = gsub("_","~",Vars2),
+           Vars2 = ifelse(grepl("_", Vars2), Vars2, paste0(Vars2, "_", Vars2))) %>%
+    separate(Vars1, into = c("Vars1_category", "Vars1"), sep = "_") %>%
+    separate(Vars2, into = c("Vars2_category", "Vars2"), sep = "_") %>%
+    mutate_at(vars(contains("Var")), funs(gsub("~","_",.))) %>% 
+    filter(Vars1 != Vars2,
+           Vars1_category != Vars2_category,
+           !is.na(correlation)) %>%
+    mutate(Vars1_category = ifelse(Vars1_category == Vars1, "", Vars1_category),
+           Vars2_category = ifelse(Vars2_category == Vars2, "", Vars2_category)) %>%
+    #order by the absolute value of correlation
+    group_by(abs(correlation)) %>% 
+    slice(1) %>% 
+    arrange(desc(abs(correlation))) %>% 
+    ungroup %>% 
+    select(-`abs(correlation)`) %>% 
+    return
+}
+```
+
+
+The "vote_difference" variable is of greatest interest here. The following correlations show us which variables are most related to the election outcomes per county.
+```{r, fig.height=5}
+library(forcats)
+
+joined_data %>% 
+  rankedCorrelations() %>% 
+  filter(Vars1 == "vote_difference" | Vars2 == "vote_difference") %>% 
+  unite(Vars, Vars1, Vars2, sep = " & ") %>% 
+  arrange(abs(correlation)) %>% 
+  mutate(Vars = fct_inorder(Vars)) %>% 
+  ggplot(aes(x = Vars, y = correlation, alpha = log(abs(correlation)))) +
+    geom_bar(stat = "identity") + 
+    coord_flip() + 
+    theme_minimal() +
+    scale_y_continuous(labels = scales::percent, limits = c(-1,1)) +
+    scale_alpha(guide = F) +
+    labs(title = "Ranked Correlations",
+         y = "Degree of correlation",
+         x = "Variable pairs")
+```
+
+#Relationships
+```{r, fig.width=10}
+joined_data %>% 
+  ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor)) + 
+    geom_point(alpha = 1/5) + 
+    theme_minimal() +
+    scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_y_continuous(labels = scales::percent) + 
+    scale_size(guide = F) +
+    labs(title = "Counties by Trump Victory Margin and Whiteness",
+         x = "Percent of county that is non-Hispanic White",
+         y = "Margin of Trump lead")
+```
+
+```{r, fig.width=10, message=FALSE, warning=FALSE}
+joined_data %>% 
+  ggplot(aes(x = TOT_POP / 1000, fill = victor)) + 
+    geom_histogram(bins = 75) + 
+    facet_wrap(~victor, scales = "free_x") +
+    theme_minimal() +
+    scale_y_log10() +
+    scale_fill_brewer(type = "qual", palette = "Set1", direction = -1) +
+    labs(title = "Distribution of County Populations",
+         subtitle = "Counties in which Trump tend to be smaller.",
+         x = "Total population in thousands")
+```
+
+```{r, fig.width=10}
+joined_data %>% 
+  ggplot(aes(x = Unemployment_rate_2015, y = vote_difference, size = TOT_POP, color = victor)) + 
+    geom_point(alpha = 1/5) + 
+    facet_wrap(~cut(people_per_sq_mile, 
+                    breaks = c(-Inf, 15, 300, Inf), 
+                    labels= c("low density", "medium density", "high density")), scales = "free_x") +
+    theme_minimal() +
+    scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_y_continuous(labels = scales::percent) + 
+    scale_size(guide = F) +
+    labs(title = "Counties by Trump Victory Margin and Whiteness",
+         subtitle = "Low density counties are more White and more pro Trump",
+         x = "Percent of county that is non-Hispanic White",
+         y = "Margin of Trump lead")
+```
+
+To detect multicolinearity, we show the correlations for 
+```{r, fig.height=8}
+joined_data %>% 
+  rankedCorrelations() %>% 
+  filter(Vars1 != "vote_difference" & Vars2 != "vote_difference") %>% 
+  unite(Vars, Vars1, Vars2, sep = " & ") %>% 
+  arrange(abs(correlation)) %>% 
+  mutate(Vars = fct_inorder(Vars)) %>% 
+  ggplot(aes(x = Vars, y = correlation, alpha = log(abs(correlation)))) +
+    geom_bar(stat = "identity") + 
+    coord_flip() + 
+    theme_minimal() +
+    scale_y_continuous(labels = scales::percent, limits = c(-1,1)) +
+    scale_alpha(guide = F) +
+    labs(title = "Ranked Correlations",
+         y = "Degree of correlation",
+         x = "Variable pairs")
+```
+`
+
+```{r, fig.width=10}
+joined_data %>% 
+  ggplot(aes(x = Median_Household_Income_2014, y = uninsured_rate_2013, size = TOT_POP)) + 
+    geom_point(alpha = 1/5) + 
+    theme_minimal() +
+    scale_x_continuous(labels = scales::dollar) + 
+    scale_y_continuous(labels = scales::percent) +
+    scale_size(guide = F)
 ```
