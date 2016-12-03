@@ -1,5 +1,6 @@
 ---
-title: "R Notebook"
+title: "Technical Appendix"
+author: "Antonio Skilton"
 output:
   html_notebook: default
   html_document: default
