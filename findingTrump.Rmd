@@ -116,7 +116,8 @@ NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
                                AGEGRP = col_integer(),
                                YEAR = col_integer(),
                                NHWA_MALE = col_integer(),
-                               NHWA_FEMALE = col_integer())) %>% 
+                               NHWA_FEMALE = col_integer()),
+         progress = F) %>% 
   filter(AGEGRP >= 5,
          YEAR == 8) %>% 
   rename(STATEFIPS = STATE) %>%
