@@ -130,7 +130,8 @@ I join these datasets:
 joined_data <- election %>% 
   inner_join(density) %>% 
   inner_join(insurance) %>% 
-  inner_join(econ)
+  inner_join(econ) %>% 
+  inner_join(NHWA)
 ```
 
 ```{r, echo=F, message=FALSE, warning=FALSE}
