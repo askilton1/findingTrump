@@ -10,7 +10,7 @@ output:
 
 ####The election data
 The data I am using is from US Election Atlas, which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
-```{r, echo=T, message=F}
+```{r, echo=T, message=F, warning=FALSE}
 library(tidyverse)
 ```
 
@@ -103,9 +103,7 @@ econ
 
 
 County characteristics dataset from the [Census](https://www.census.gov/popest/data/counties/asrh/2015/CC-EST2015-ALLDATA.html):
-
-
-```{r}
+```{r, message=FALSE, warning=FALSE}
 NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
          col_types = cols_only(STATE = col_integer(),
                                COUNTY = col_integer(),
@@ -125,6 +123,7 @@ NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
 ```{r, echo=F}
 NHWA
 ```
+
 
 I join these datasets:
 (note! we lost quite a few counties because Alaska counts votes in "Election Districts", which do not line up with counties.)
