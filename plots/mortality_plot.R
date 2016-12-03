@@ -1,21 +1,11 @@
 library(tidyverse)
 mortality <- read_tsv("data/clean/Compressed Mortality, 1999-2014.txt")
 
-unemployment <- read_csv("data/clean/Unemployment.csv") %>% 
-  mutate(Unemployment_rate_2015 = Unemployment_rate_2015 / 100)
+unemployment <- read_csv("data/clean/Unemployment.csv") 
 
 election <- read_csv("data/clean/Pres_Election_DatA_2016i.csv")
 
-pop <- read_csv("data/clean/CC-EST2015-ALLDATA.csv", col_types = cols_only(STATEFIPS = col_integer(),
-                                                                           COUNTY = col_integer(),
-                                                                           TOT_POP = col_integer(),
-                                                                           NHWA_MALE = col_double(),
-                                                                           NHWA_FEMALE = col_double())) %>% 
-  group_by(STATEFIPS, COUNTY) %>% 
-  mutate(NHWA = NHWA_MALE + NHWA_FEMALE,
-         NHWA = TOT_POP * NHWA) %>% 
-  summarise_at(vars(TOT_POP, NHWA), sum) %>% 
-  mutate(NHWA = NHWA / TOT_POP)
+pop <- read_csv("data/clean/CC-EST2015-ALLDATA.csv")
 
 insurance <- read_csv("data/clean/County_Data_2016_health_insurance.csv")
 
