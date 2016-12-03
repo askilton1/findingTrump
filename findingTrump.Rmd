@@ -4,6 +4,7 @@ author: "Antonio Skilton"
 output:
   md_document:
     variant: markdown_github
+  output: html_notebook
 ---
 
 ##The Data
@@ -292,7 +293,7 @@ joined_data %>%
 
 #Random Forest Time
 ```{r, message=FALSE, warning=FALSE}
-library(randomForest, quietly = T)
+library(randomForest)
 sample_data <- (joined_data)
 data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
                         y = joined_data$vote_difference,

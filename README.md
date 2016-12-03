@@ -347,24 +347,6 @@ Random Forest Time
 
 ``` r
 library(randomForest)
-```
-
-    ## randomForest 4.6-12
-
-    ## Type rfNews() to see new features/changes/bug fixes.
-
-    ## 
-    ## Attaching package: 'randomForest'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     combine
-
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     margin
-
-``` r
 sample_data <- (joined_data)
 data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
                         y = joined_data$vote_difference,
@@ -376,13 +358,13 @@ tibble(Variable = names(imp),`%Increase in MSE` = round(imp, 2) / 100)
     ## # A tibble: 10 × 2
     ##                        Variable `%Increase in MSE`
     ##                           <chr>              <dbl>
-    ## 1                          NHWA             1.0064
-    ## 2                     STATEFIPS             0.5414
-    ## 3           uninsured_rate_2016             0.5147
-    ## 4                       TOT_POP             0.5057
-    ## 5        Unemployment_rate_2015             0.4340
-    ## 6           uninsured_rate_2013             0.4003
-    ## 7  Median_Household_Income_2014             0.3863
-    ## 8            people_per_sq_mile             0.3637
-    ## 9                        change             0.3333
-    ## 10                       COUNTY             0.2212
+    ## 1                          NHWA             0.9955
+    ## 2                     STATEFIPS             0.5456
+    ## 3           uninsured_rate_2016             0.5059
+    ## 4                       TOT_POP             0.4622
+    ## 5        Unemployment_rate_2015             0.4317
+    ## 6           uninsured_rate_2013             0.4007
+    ## 7            people_per_sq_mile             0.3638
+    ## 8  Median_Household_Income_2014             0.3565
+    ## 9                        change             0.3164
+    ## 10                       COUNTY             0.2372
