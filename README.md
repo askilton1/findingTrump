@@ -233,6 +233,7 @@ joined_data %>%
 The "vote\_difference" variable is of greatest interest here. The following correlations show us which variables are most related to the election outcomes per county.
 
 ``` r
+library(antonioSkiltonTools)
 library(forcats)
 
 joined_data %>% 
@@ -358,13 +359,13 @@ tibble(Variable = names(imp),`%Increase in MSE` = round(imp, 2) / 100)
     ## # A tibble: 10 × 2
     ##                        Variable `%Increase in MSE`
     ##                           <chr>              <dbl>
-    ## 1                          NHWA             0.9955
-    ## 2                     STATEFIPS             0.5456
-    ## 3           uninsured_rate_2016             0.5059
-    ## 4                       TOT_POP             0.4622
-    ## 5        Unemployment_rate_2015             0.4317
-    ## 6           uninsured_rate_2013             0.4007
-    ## 7            people_per_sq_mile             0.3638
-    ## 8  Median_Household_Income_2014             0.3565
-    ## 9                        change             0.3164
-    ## 10                       COUNTY             0.2372
+    ## 1                          NHWA             0.9564
+    ## 2                     STATEFIPS             0.5502
+    ## 3           uninsured_rate_2016             0.4824
+    ## 4                       TOT_POP             0.4689
+    ## 5        Unemployment_rate_2015             0.4185
+    ## 6  Median_Household_Income_2014             0.3842
+    ## 7           uninsured_rate_2013             0.3785
+    ## 8            people_per_sq_mile             0.3718
+    ## 9                        change             0.3202
+    ## 10                       COUNTY             0.2317
