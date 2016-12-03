@@ -146,10 +146,12 @@ joined_data <- election %>%
 joined_data
 ```
 
-```{r}
+```{r, fig.width=10}
 joined_data %>%
-  gather(key, value, people_per_sq_mile:Median_Household_Income_2014) %>% 
+  gather(key, value, people_per_sq_mile:NHWA) %>% 
   ggplot(aes(x = value)) +
     geom_histogram() +
-    facet_wrap(~key, scales = "free")
+    facet_wrap(~key, scales = "free") + 
+    theme_minimal()
+```
 ```
