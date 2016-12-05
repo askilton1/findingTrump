@@ -25,7 +25,7 @@ temp %>%
   summarise(n = n() / 1000,
             percent_white = mean(RACWHT),
             percent_college = mean(college),
-            income_gap = as.numeric(summary(HHINCOME)[5] - summary(HHINCOME)[2]) / 1000,
+            income_gap = sd(HHINCOME),
             #metropolitan = as.factor(ifelse(mean(METRO) > 0.5, 1, 0))
             metro = mean(METRO)) %>%
   ggplot(aes(x = percent_college, y = income_gap, alpha = 0.5, size = n)) +
@@ -34,8 +34,10 @@ temp %>%
     facet_wrap(~ REGION) +
     theme_minimal() + 
     theme(legend.position = "minimal") +
-    labs(y = "Intra-county income gap, in thousands of dollars",
+    labs(y = "Intra-county standard deviation of household income",
          x = "Percent of county with college degree",
          title = "Counties with higher college education rates have higher income disparity",
-         subtitle = "This correlation is especially strong in the Pacific, Middle Atlantic, and South Atlantic")
+         subtitle = "This correlation is especially strong in the Pacific, Middle Atlantic, and South Atlantic") +
+    scale_y_continuous(labels = scales::dollar) +
+    scale_x_continuous(labels = scales::percent)
 ggsave("plots/output/college_degree_and_income_gap_by_region.pdf")
