@@ -187,7 +187,7 @@ education <- read_csv("data/raw/Education.csv", skip = 4) %>%
 education
 ```
 
-```{r, fig.height=10, fig.width=10, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, fig.height = 10, fig.width=10}
 education %>% 
   na.omit() %>% 
   gather(key, value, bachelorsOrMore:HSDonly) %>% 
@@ -217,13 +217,18 @@ education %>%
 ```
 
 Using this time series data we can calculate growth rates. This is convenient because it returns us to a countly level dataset where each row represents a column, as opposed to a column-decade. Note that the growth rates are not annual growth rates but represent change over the course of 40 years.
-```{r}
-read_csv("data/clean/Education.csv") %>% 
+```{r, message=FALSE, warning=FALSE}
+education_growth <- read_csv("data/clean/Education.csv") %>% 
   group_by(STATEFIPS, COUNTY) %>% 
   summarise_at(vars(bachelorsOrMore:HSDonly), function(col) last(col) - first(col)) %>% 
   inner_join(read_csv("data/clean/Pres_Election_Data_2016i.csv")) %>% 
   select(STATEFIPS, COUNTY, vote_difference, victor, bachelorsOrMore:HSDonly)
 ```
+
+```{r, echo=F}
+education_growth
+```
+
 
 Growth rates in each of the four variables in the education data have an independent effect on a vote for trump, as shown in the regression results below.
 ```{r, message=FALSE, warning=FALSE}
@@ -235,6 +240,7 @@ read_csv("data/clean/Education_growth.csv") %>%
 I join these datasets:
 ```{r, message=FALSE, warning=FALSE}
 joined_data <- election %>% 
+  inner_join(education_growth) %>% 
   inner_join(density) %>% 
   inner_join(insurance) %>% 
   inner_join(econ) %>% 
@@ -247,7 +253,7 @@ joined_data
 
 ```{r, fig.width=10}
 joined_data %>%
-  gather(key, value, people_per_sq_mile:NHWA) %>% 
+  gather(key, value, bachelorsOrMore:NHWA) %>% 
   ggplot(aes(x = value)) +
     geom_histogram() +
     facet_wrap(~key, scales = "free") + 
@@ -277,10 +283,10 @@ joined_data %>%
 ```
 
 #Relationships
-```{r, fig.width=10}
+```{r, fig.width=7}
 joined_data %>% 
   ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor)) + 
-    geom_point(alpha = 1/5) + 
+    geom_point(alpha = 1/3) + 
     theme_minimal() +
     scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
     scale_x_continuous(labels = scales::percent) +
@@ -291,7 +297,7 @@ joined_data %>%
          y = "Margin of Trump lead")
 ```
 
-```{r, fig.width=10, message=FALSE, warning=FALSE}
+```{r, fig.width=6, message=FALSE, warning=FALSE, fig.height=3}
 joined_data %>% 
   ggplot(aes(x = TOT_POP / 1000, fill = victor)) + 
     geom_histogram(bins = 75) + 
@@ -304,10 +310,10 @@ joined_data %>%
          x = "Total population in thousands")
 ```
 
-```{r, fig.width=10}
+```{r, fig.width=7}
 joined_data %>% 
   ggplot(aes(x = Unemployment_rate_2015, y = vote_difference, size = TOT_POP, color = victor)) + 
-    geom_point(alpha = 1/5) + 
+    geom_point(alpha = 1/3) + 
     facet_wrap(~cut(people_per_sq_mile, 
                     breaks = c(-Inf, 15, 300, Inf), 
                     labels= c("low density", "medium density", "high density")), scales = "free_x") +
@@ -329,8 +335,9 @@ joined_data %>%
   filter(Vars1 != "vote_difference" & Vars2 != "vote_difference") %>% 
   unite(Vars, Vars1, Vars2, sep = " & ") %>% 
   arrange(abs(correlation)) %>% 
-  mutate(Vars = fct_inorder(Vars)) %>% 
-  ggplot(aes(x = Vars, y = correlation, alpha = log(abs(correlation)))) +
+  mutate(Vars = fct_inorder(Vars)) %>%
+  slice(-60) %>% 
+  ggplot(aes(x = Vars, y = correlation, alpha = (abs(correlation)))) +
     geom_bar(stat = "identity") + 
     coord_flip() + 
     theme_minimal() +
