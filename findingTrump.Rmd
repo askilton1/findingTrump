@@ -196,7 +196,7 @@ education %>%
                                         "lessThanHSD", "someCollege"),
                                to = c("Bachelors Degree or More", "High School Degree Only",
                                       "Less Than High School", "Some College"))) %>% 
-group_by(STATEFIPS, year, key) %>% 
+  group_by(STATEFIPS, year, key) %>% 
   mutate(avgyear = mean(value)) %>% 
   arrange(STATEFIPS, year) %>% 
   group_by(STATEFIPS, key) %>% 
