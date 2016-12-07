@@ -204,15 +204,16 @@ education %>%
             year, 
             value,
             percent_growth = (last(avgyear) - first(avgyear)) / first(avgyear)) %>% 
-  unite(state_county, STATEFIPS, COUNTY, remove = F) %>% 
+  unite(state_county, STATEFIPS, COUNTY) %>% 
   ggplot(aes(x = year, y = value, color = percent_growth, group = state_county)) +
-  geom_line(alpha = 1/10) +
-  theme(legend.position = "none") +
-  facet_wrap(~key) + 
-  scale_y_continuous(labels = scales::percent) +
-  theme_minimal() + 
-  labs(title = "Percent of Population by Year",
-       y = "Percent with Bachelors Degree or More")
+    geom_line(alpha = 1/10) +
+    theme(legend.position = "none") +
+    facet_wrap(~key) + 
+    scale_y_continuous(labels = scales::percent) +
+    scale_color_continuous(labels = scales::percent) +
+    theme_minimal() + 
+    labs(title = "Percent of Population by Year",
+         y = "Percent of population")
 ```
 
 Using this time series data we can calculate growth rates. This is convenient because it returns us to a countly level dataset where each row represents a column, as opposed to a column-decade. Note that the growth rates are not annual growth rates but represent change over the course of 40 years.
