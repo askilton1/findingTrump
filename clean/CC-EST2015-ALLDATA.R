@@ -1,5 +1,6 @@
 library(tidyverse)
 #https://www.census.gov/popest/data/counties/asrh/2015/CC-EST2015-ALLDATA.html
+#file in raw data has been stripped to columns as defined below:
 read_csv("data/raw/CC-EST2015-ALLDATA.csv",
          col_types = cols_only(STATE = col_integer(),
                                COUNTY = col_integer(),

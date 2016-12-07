@@ -8,10 +8,21 @@ finding_trump.db
 <<<<<<< HEAD
 =======
 
-
 .db
 >>>>>>> origin/master
-*.csv
 .RData
 
 finding_trump.db-journal
+
+data/raw/Built_FDIC_2009_2015_labeled.csv
+
+data/raw/Built_FDIC_2009_2015.csv
+
+
+data/clean/usa_00005_RELATE.csv
+
+data/raw/usa_00005.csv
+
+data/clean/Built_FDIC_2009_2015_2.csv
+
+data/clean/usa_00005_2.csv
