@@ -2,9 +2,6 @@
 title: "Technical Appendix"
 author: "Antonio Skilton"
 output: html_notebook
-output:
-  md_document:
-    variant: markdown_github
 ---
 
 ##The Data
@@ -153,8 +150,8 @@ NHWA %>%
          `Non-Hispanic White Alone (NHWA)` = NHWA)
 ```
 
-Education data from 
-```{r}
+Education data from
+```{r, message=FALSE, warning=FALSE}
 education <- read_csv("data/raw/Education.csv", skip = 4) %>%
   slice(-c(1,2)) %>% 
   select(`FIPS Code`, contains("Percent")) %>% 
@@ -180,6 +177,10 @@ education <- read_csv("data/raw/Education.csv", skip = 4) %>%
   unite(HSDonly, contains("HSD_only")) %>% 
   mutate_at(vars(bachelorsOrMore:HSDonly), funs(as.numeric(gsub("NA|_", "", .)))) %>% 
   filter(COUNTY != 0)
+```
+
+```{r, echo=F}
+education
 ```
 
 ```{r, fig.height=10, fig.width=10, message=FALSE, warning=FALSE}
@@ -208,6 +209,22 @@ group_by(STATEFIPS, year, key) %>%
   theme_minimal() + 
   labs(title = "Percent of Population by Year",
        y = "Percent with Bachelors Degree or More")
+```
+
+Using this time series data we can calculate growth rates. This is convenient because it returns us to a countly level dataset where each row represents a column, as opposed to a column-decade. Note that the growth rates are not annual growth rates but represent change over the course of 40 years.
+```{r}
+read_csv("data/clean/Education.csv") %>% 
+  group_by(STATEFIPS, COUNTY) %>% 
+  summarise_at(vars(bachelorsOrMore:HSDonly), function(col) last(col) - first(col)) %>% 
+  inner_join(read_csv("data/clean/Pres_Election_Data_2016i.csv")) %>% 
+  select(STATEFIPS, COUNTY, vote_difference, victor, bachelorsOrMore:HSDonly)
+```
+
+Growth rates in each of the four variables in the education data have an independent effect on a vote for trump, as shown in the regression results below.
+```{r, message=FALSE, warning=FALSE}
+read_csv("data/clean/Education_growth.csv") %>% 
+  lm(vote_difference ~ bachelorsOrMore + someCollege + lessThanHSD + HSDonly, data = .) %>% 
+  summary
 ```
 
 I join these datasets:
