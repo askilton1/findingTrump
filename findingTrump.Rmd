@@ -1,10 +1,10 @@
 ---
 title: "Technical Appendix"
 author: "Antonio Skilton"
+output: html_notebook
 output:
   md_document:
     variant: markdown_github
-  output: html_notebook
 ---
 
 ##The Data
