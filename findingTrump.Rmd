@@ -133,6 +133,62 @@ NHWA %>%
          `Non-Hispanic White Alone (NHWA)` = NHWA)
 ```
 
+Education data from 
+```{r}
+education <- read_csv("data/raw/Education.csv", skip = 4) %>%
+  slice(-c(1,2)) %>% 
+  select(`FIPS Code`, contains("Percent")) %>% 
+  setNames(gsub(pattern = "[[:punct:]]| ", replacement = "_", names(.))) %>%
+  setNames(gsub(pattern = "High_school_diploma", replacement = "HSD", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "Some_college_or_associate_s_degree|some_college_", replacement = "someCollege", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "bachelor_s_degree_or_higher", replacement = "bachelorsOrMore", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "with_less_than_a_HSD_|less_than_a_HSD_", replacement = "lessThanHSD", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "percent_of_", replacement = "", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "___|__", replacement = "_", names(.))) %>%
+  mutate(STATEFIPS = as.numeric(substr(FIPS_Code, 1, 2)),
+         COUNTY = as.numeric(substr(FIPS_Code, 3, 5))) %>%
+  select(STATEFIPS, COUNTY, -FIPS_Code, adults_lessThanHSD_1970:adults_with_a_bachelorsOrMore_2010_2014) %>% 
+  gather(key, value, -STATEFIPS, -COUNTY) %>% 
+  transmute(STATEFIPS, COUNTY, key, percent = value / 100,
+            year = gsub('\\D','\\1', key),
+            year = as.numeric(substr(year, nchar(year) - 3, nchar(year))),
+            year = ifelse(year == 2014, 2010, year)) %>% 
+  spread(key, percent, drop = FALSE) %>% 
+  unite(someCollege, contains("someCollege")) %>% 
+  unite(bachelorsOrMore, contains("bachelorsOrMore"), contains("four_years_of_college_or_higher")) %>% 
+  unite(lessThanHSD, contains("lessThanHSD")) %>% 
+  unite(HSDonly, contains("HSD_only")) %>% 
+  mutate_at(vars(bachelorsOrMore:HSDonly), funs(as.numeric(gsub("NA|_", "", .)))) %>% 
+  filter(COUNTY != 0)
+```
+
+```{r, fig.height=10, fig.width=10, message=FALSE, warning=FALSE}
+education %>% 
+  na.omit() %>% 
+  gather(key, value, bachelorsOrMore:HSDonly) %>% 
+  mutate(key = plyr::mapvalues(key, 
+                               from = c("bachelorsOrMore", "HSDonly", 
+                                        "lessThanHSD", "someCollege"),
+                               to = c("Bachelors Degree or More", "High School Degree Only",
+                                      "Less Than High School", "Some College"))) %>% 
+group_by(STATEFIPS, year, key) %>% 
+  mutate(avgyear = mean(value)) %>% 
+  arrange(STATEFIPS, year) %>% 
+  group_by(STATEFIPS, key) %>% 
+  transmute(COUNTY,
+            year, 
+            value,
+            percent_growth = (last(avgyear) - first(avgyear)) / first(avgyear)) %>% 
+  unite(state_county, STATEFIPS, COUNTY, remove = F) %>% 
+  ggplot(aes(x = year, y = value, color = percent_growth, group = state_county)) +
+  geom_line(alpha = 1/10) +
+  theme(legend.position = "none") +
+  facet_wrap(~key) + 
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() + 
+  labs(title = "Percent of Population by Year",
+       y = "Percent with Bachelors Degree or More")
+```
 
 I join these datasets:
 ```{r, message=FALSE, warning=FALSE}
@@ -243,7 +299,6 @@ joined_data %>%
          x = "Variable pairs")
 ```
 
-
 ```{r, fig.width=10}
 joined_data %>% 
   ggplot(aes(x = Median_Household_Income_2014, y = uninsured_rate_2013, size = TOT_POP)) + 
@@ -264,5 +319,3 @@ data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
 imp <- importance(data.rf, 1)[order(importance(data.rf, 1), decreasing = T),] 
 tibble(Variable = names(imp),`%Increase in MSE` = round(imp, 2) / 100)
 ```
-
-
