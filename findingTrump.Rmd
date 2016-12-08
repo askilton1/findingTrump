@@ -15,9 +15,11 @@ knitr::opts_chunk$set(fig.width=10, fig.height=8, fig.path='Figs/',
 The data I am using is from [US Election Atlas](http://uselectionatlas.org/), which sells proprietary data. As a result, I will not include their entire dataset here. Instead, I will only include a variable that represents the vote difference between the candidates on a county level.
 ```{r, echo=T, message=F, warning=FALSE, eval=F}
 library(tidyverse)
+library(plotly)
 ```
-```{r, echo=F}
+```{r, echo=F, message=FALSE, warning=FALSE}
 library(tidyverse, quietly=T)
+library(plotly, quietly=T)
 ```
 
 ```{r, message=F, warning=F}
@@ -38,7 +40,9 @@ election <- read_csv("data/raw/Pres_Election_Data_2016i.csv",
          STATEFIPS = ST) %>% 
   mutate_at(3:4, funs(as.numeric(gsub("%", "", .))/100)) %>% 
   na.omit %>% 
-  transmute(STATEFIPS,
+  transmute(STATEFIPS, 
+            county_name,
+            STATEABB,
             COUNTY = as.numeric(substr(COUNTY, 3, 5)),
             vote_difference = Trump - Clinton,
             victor = ifelse(vote_difference > 0, "Trump", "Clinton")) 
@@ -335,14 +339,13 @@ joined_data %>%
          x = "Variable pairs")
 ```
 #Charts
-```{r, fig.width=8}
-joined_data %>% 
-  ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor)) + 
+```{r, fig.width=10}
+p <- joined_data %>% 
+  unite(Location, county_name, STATEABB, sep = ", ") %>% 
+  ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor, group = Location)) + 
     geom_point(alpha = 1/3) + 
     theme_minimal() +
-    theme(legend.position = c(.8, 1.05),
-            legend.direction = "horizontal",
-            legend.title = element_blank()) +
+    theme(legend.title = element_blank()) +
     scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
     scale_x_continuous(labels = scales::percent) +
     scale_y_continuous(labels = scales::percent) + 
@@ -350,6 +353,8 @@ joined_data %>%
     labs(title = "Counties by Trump Victory Margin and Whiteness",
          x = "Percent of county that is non-Hispanic White",
          y = "Margin of Trump lead")
+
+ggplotly(p, tooltip = c("group"))
 ```
 
 ####County Populations
@@ -370,16 +375,15 @@ joined_data %>%
 
 ####Whiteness
 ```{r, fig.width=8}
-joined_data %>% 
-  ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor)) + 
+p2 <- joined_data %>% 
+  unite(Location, county_name, STATEABB, sep = ", ") %>% 
+  ggplot(aes(x = NHWA, y = vote_difference, size = TOT_POP, color = victor, group = Location)) + 
     geom_point(alpha = 1/3) + 
     facet_wrap(~cut(people_per_sq_mile, 
                     breaks = c(-Inf, 15, 300, Inf), 
                     labels= c("low density", "medium density", "high density")), scales = "free_x") +
     theme_minimal() +
-    theme(legend.position = c(.8, 1.15),
-            legend.direction = "horizontal",
-            legend.title = element_blank()) +
+    theme(legend.title = element_blank()) +
     scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
     scale_x_continuous(labels = scales::percent) +
     scale_y_continuous(labels = scales::percent) + 
@@ -388,17 +392,18 @@ joined_data %>%
          subtitle = "Low density counties are more White and more pro Trump",
          x = "Percent of county that is non-Hispanic White",
          y = "Margin of Trump lead")
+
+ggplotly(p2, tooltip = "group")
 ```
 
 ####College Education
 ```{r, fig.width=8}
-joined_data %>% 
-  ggplot(aes(x = bachelorsOrMore, y = vote_difference, size = TOT_POP, color = victor)) + 
+p3 <- joined_data %>% 
+  unite(Location, county_name, STATEABB, sep = ", ") %>% 
+  ggplot(aes(x = bachelorsOrMore, y = vote_difference, size = TOT_POP, color = victor, group = Location)) + 
     geom_point(alpha = 1/3) + 
     theme_minimal() +
-    theme(legend.position = c(.8, 1.08),
-          legend.direction = "horizontal",
-          legend.title = element_blank()) +
+    theme(legend.title = element_blank()) +
     scale_color_brewer(type = "qual", palette = "Set1", direction = -1) +
     scale_x_continuous(labels = scales::percent) +
     scale_y_continuous(labels = scales::percent) + 
@@ -407,12 +412,15 @@ joined_data %>%
          subtitle = "Trump more likely to win counties with a lower share of college educated people.",
          x = "Percent of county that has at least a bachelors degree",
          y = "Margin of Trump lead")
+
+ggplotly(p3, tooltip = "group")
 ```
 
 ####Health Insurance and Median Household Income
 ```{r, fig.width=10}
-joined_data %>% 
-  ggplot(aes(x = Median_Household_Income_2014, y = uninsured_rate_2013, size = TOT_POP)) + 
+p4 <- joined_data %>% 
+  unite(Location, county_name, STATEABB, sep = ", ") %>% 
+  ggplot(aes(x = Median_Household_Income_2014, y = uninsured_rate_2013, size = TOT_POP, group = Location)) + 
     geom_point(alpha = 1/5) + 
     theme_minimal() +
     scale_x_continuous(labels = scales::dollar) + 
@@ -421,6 +429,8 @@ joined_data %>%
     labs(title = "Rate of Uninsured by Median Household Income",
          y = "Percent of county that is uninsured",
          x = "Median Household Income in 2014")
+
+ggplotly(p4, tooltip = "group")
 ```
 
 

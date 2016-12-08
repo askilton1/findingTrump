@@ -1,0 +1,987 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 10100.16.1103.2343                               -->
+<workbook source-build='10.1.1 (10100.16.1103.2343)' source-platform='mac' version='10.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='Pres_Election_Data_2016i+' inline='true' name='federated.1qfyy3s1dnitu51g0bssy0dbzk2k' version='10.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='Pres_Election_Data_2016i' name='textscan.0ecxwaa1nloano18avogi0xln1kf'>
+            <connection class='textscan' directory='/Users/AntonioSkilton/Dropbox/R/findingTrump/data/clean' filename='Pres_Election_Data_2016i.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation join='inner' type='join'>
+          <clause type='join'>
+            <expression op='='>
+              <expression op='[Pres_Election_Data_2016i.csv].[COUNTY]' />
+              <expression op='[Unemployment.csv].[COUNTY]' />
+            </expression>
+          </clause>
+          <relation join='inner' type='join'>
+            <clause type='join'>
+              <expression op='='>
+                <expression op='[Pres_Election_Data_2016i.csv].[COUNTY]' />
+                <expression op='[Education_growth.csv].[COUNTY]' />
+              </expression>
+            </clause>
+            <relation join='inner' type='join'>
+              <clause type='join'>
+                <expression op='='>
+                  <expression op='[Pres_Election_Data_2016i.csv].[COUNTY]' />
+                  <expression op='[Education.csv].[COUNTY]' />
+                </expression>
+              </clause>
+              <relation join='inner' type='join'>
+                <clause type='join'>
+                  <expression op='='>
+                    <expression op='[Pres_Election_Data_2016i.csv].[COUNTY]' />
+                    <expression op='[county_density.csv].[COUNTY]' />
+                  </expression>
+                </clause>
+                <relation join='inner' type='join'>
+                  <clause type='join'>
+                    <expression op='='>
+                      <expression op='[Pres_Election_Data_2016i.csv].[COUNTY]' />
+                      <expression op='[County_Data_2016_health_insurance.csv].[COUNTY]' />
+                    </expression>
+                  </clause>
+                  <relation join='inner' type='join'>
+                    <clause type='join'>
+                      <expression op='AND'>
+                        <expression op='='>
+                          <expression op='[Pres_Election_Data_2016i.csv].[COUNTY]' />
+                          <expression op='[CC-EST2015-ALLDATA.csv].[COUNTY]' />
+                        </expression>
+                        <expression op='='>
+                          <expression op='[Pres_Election_Data_2016i.csv].[STATEFIPS]' />
+                          <expression op='[CC-EST2015-ALLDATA.csv].[STATEFIPS]' />
+                        </expression>
+                      </expression>
+                    </clause>
+                    <relation connection='textscan.0ecxwaa1nloano18avogi0xln1kf' name='Pres_Election_Data_2016i.csv' table='[Pres_Election_Data_2016i#csv]' type='table'>
+                      <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                        <column datatype='integer' name='STATEFIPS' ordinal='0' />
+                        <column datatype='string' name='county_name' ordinal='1' />
+                        <column datatype='string' name='STATEABB' ordinal='2' />
+                        <column datatype='integer' name='COUNTY' ordinal='3' />
+                        <column datatype='real' name='vote_difference' ordinal='4' />
+                        <column datatype='string' name='victor' ordinal='5' />
+                      </columns>
+                    </relation>
+                    <relation connection='textscan.0ecxwaa1nloano18avogi0xln1kf' name='CC-EST2015-ALLDATA.csv' table='[CC-EST2015-ALLDATA#csv]' type='table'>
+                      <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                        <column datatype='integer' name='STATEFIPS' ordinal='0' />
+                        <column datatype='integer' name='COUNTY' ordinal='1' />
+                        <column datatype='integer' name='TOT_POP' ordinal='2' />
+                        <column datatype='real' name='NHWA' ordinal='3' />
+                      </columns>
+                    </relation>
+                  </relation>
+                  <relation connection='textscan.0ecxwaa1nloano18avogi0xln1kf' name='County_Data_2016_health_insurance.csv' table='[County_Data_2016_health_insurance#csv]' type='table'>
+                    <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                      <column datatype='real' name='STATEFIPS' ordinal='0' />
+                      <column datatype='integer' name='COUNTY' ordinal='1' />
+                      <column datatype='real' name='uninsured_rate_2013' ordinal='2' />
+                      <column datatype='real' name='uninsured_rate_2016' ordinal='3' />
+                      <column datatype='real' name='change' ordinal='4' />
+                    </columns>
+                  </relation>
+                </relation>
+                <relation connection='textscan.0ecxwaa1nloano18avogi0xln1kf' name='county_density.csv' table='[county_density#csv]' type='table'>
+                  <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                    <column datatype='real' name='STATEFIPS' ordinal='0' />
+                    <column datatype='integer' name='COUNTY' ordinal='1' />
+                    <column datatype='real' name='people_per_sq_mile' ordinal='2' />
+                  </columns>
+                </relation>
+              </relation>
+              <relation connection='textscan.0ecxwaa1nloano18avogi0xln1kf' name='Education.csv' table='[Education#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                  <column datatype='real' name='STATEFIPS' ordinal='0' />
+                  <column datatype='integer' name='COUNTY' ordinal='1' />
+                  <column datatype='real' name='year' ordinal='2' />
+                  <column datatype='real' name='bachelorsOrMore' ordinal='3' />
+                  <column datatype='real' name='someCollege' ordinal='4' />
+                  <column datatype='real' name='lessThanHSD' ordinal='5' />
+                  <column datatype='real' name='HSDonly' ordinal='6' />
+                </columns>
+              </relation>
+            </relation>
+            <relation connection='textscan.0ecxwaa1nloano18avogi0xln1kf' name='Education_growth.csv' table='[Education_growth#csv]' type='table'>
+              <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                <column datatype='real' name='STATEFIPS' ordinal='0' />
+                <column datatype='integer' name='COUNTY' ordinal='1' />
+                <column datatype='real' name='vote_difference' ordinal='2' />
+                <column datatype='string' name='victor' ordinal='3' />
+                <column datatype='real' name='bachelorsOrMore' ordinal='4' />
+                <column datatype='real' name='someCollege' ordinal='5' />
+                <column datatype='real' name='lessThanHSD' ordinal='6' />
+                <column datatype='real' name='HSDonly' ordinal='7' />
+              </columns>
+            </relation>
+          </relation>
+          <relation connection='textscan.0ecxwaa1nloano18avogi0xln1kf' name='Unemployment.csv' table='[Unemployment#csv]' type='table'>
+            <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+              <column datatype='real' name='STATEFIPS' ordinal='0' />
+              <column datatype='integer' name='COUNTY' ordinal='1' />
+              <column datatype='real' name='Unemployment_rate_2015' ordinal='2' />
+              <column datatype='real' name='Median_Household_Income_2014' ordinal='3' />
+            </columns>
+          </relation>
+        </relation>
+        <cols>
+          <map key='[COUNTY (CC-EST2015-ALLDATA.csv)]' value='[CC-EST2015-ALLDATA.csv].[COUNTY]' />
+          <map key='[COUNTY (County_Data_2016_health_insurance.csv)]' value='[County_Data_2016_health_insurance.csv].[COUNTY]' />
+          <map key='[COUNTY (Education.csv)]' value='[Education.csv].[COUNTY]' />
+          <map key='[COUNTY (Education_growth.csv)]' value='[Education_growth.csv].[COUNTY]' />
+          <map key='[COUNTY (Unemployment.csv)]' value='[Unemployment.csv].[COUNTY]' />
+          <map key='[COUNTY (county_density.csv)]' value='[county_density.csv].[COUNTY]' />
+          <map key='[COUNTY]' value='[Pres_Election_Data_2016i.csv].[COUNTY]' />
+          <map key='[HSDonly (Education_growth.csv)]' value='[Education_growth.csv].[HSDonly]' />
+          <map key='[HSDonly]' value='[Education.csv].[HSDonly]' />
+          <map key='[Median_Household_Income_2014]' value='[Unemployment.csv].[Median_Household_Income_2014]' />
+          <map key='[NHWA]' value='[CC-EST2015-ALLDATA.csv].[NHWA]' />
+          <map key='[STATEABB]' value='[Pres_Election_Data_2016i.csv].[STATEABB]' />
+          <map key='[STATEFIPS (CC-EST2015-ALLDATA.csv)]' value='[CC-EST2015-ALLDATA.csv].[STATEFIPS]' />
+          <map key='[STATEFIPS (County_Data_2016_health_insurance.csv)]' value='[County_Data_2016_health_insurance.csv].[STATEFIPS]' />
+          <map key='[STATEFIPS (Education.csv)]' value='[Education.csv].[STATEFIPS]' />
+          <map key='[STATEFIPS (Education_growth.csv)]' value='[Education_growth.csv].[STATEFIPS]' />
+          <map key='[STATEFIPS (Unemployment.csv)]' value='[Unemployment.csv].[STATEFIPS]' />
+          <map key='[STATEFIPS (county_density.csv)]' value='[county_density.csv].[STATEFIPS]' />
+          <map key='[STATEFIPS]' value='[Pres_Election_Data_2016i.csv].[STATEFIPS]' />
+          <map key='[TOT_POP]' value='[CC-EST2015-ALLDATA.csv].[TOT_POP]' />
+          <map key='[Unemployment_rate_2015]' value='[Unemployment.csv].[Unemployment_rate_2015]' />
+          <map key='[bachelorsOrMore (Education_growth.csv)]' value='[Education_growth.csv].[bachelorsOrMore]' />
+          <map key='[bachelorsOrMore]' value='[Education.csv].[bachelorsOrMore]' />
+          <map key='[change]' value='[County_Data_2016_health_insurance.csv].[change]' />
+          <map key='[county_name]' value='[Pres_Election_Data_2016i.csv].[county_name]' />
+          <map key='[lessThanHSD (Education_growth.csv)]' value='[Education_growth.csv].[lessThanHSD]' />
+          <map key='[lessThanHSD]' value='[Education.csv].[lessThanHSD]' />
+          <map key='[people_per_sq_mile]' value='[county_density.csv].[people_per_sq_mile]' />
+          <map key='[someCollege (Education_growth.csv)]' value='[Education_growth.csv].[someCollege]' />
+          <map key='[someCollege]' value='[Education.csv].[someCollege]' />
+          <map key='[uninsured_rate_2013]' value='[County_Data_2016_health_insurance.csv].[uninsured_rate_2013]' />
+          <map key='[uninsured_rate_2016]' value='[County_Data_2016_health_insurance.csv].[uninsured_rate_2016]' />
+          <map key='[victor (Education_growth.csv)]' value='[Education_growth.csv].[victor]' />
+          <map key='[victor]' value='[Pres_Election_Data_2016i.csv].[victor]' />
+          <map key='[vote_difference (Education_growth.csv)]' value='[Education_growth.csv].[vote_difference]' />
+          <map key='[vote_difference]' value='[Pres_Election_Data_2016i.csv].[vote_difference]' />
+          <map key='[year]' value='[Education.csv].[year]' />
+        </cols>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>STATEFIPS</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[STATEFIPS]</local-name>
+            <parent-name>[Pres_Election_Data_2016i.csv]</parent-name>
+            <remote-alias>STATEFIPS</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>county_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[county_name]</local-name>
+            <parent-name>[Pres_Election_Data_2016i.csv]</parent-name>
+            <remote-alias>county_name</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteCollation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='DebugRemoteMetadata (compression)'>&quot;heap&quot;</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>4294967292</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (storagewidth)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;str&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATEABB</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[STATEABB]</local-name>
+            <parent-name>[Pres_Election_Data_2016i.csv]</parent-name>
+            <remote-alias>STATEABB</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteCollation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='DebugRemoteMetadata (compression)'>&quot;heap&quot;</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>4294967292</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (storagewidth)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;str&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTY</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COUNTY]</local-name>
+            <parent-name>[Pres_Election_Data_2016i.csv]</parent-name>
+            <remote-alias>COUNTY</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>vote_difference</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[vote_difference]</local-name>
+            <parent-name>[Pres_Election_Data_2016i.csv]</parent-name>
+            <remote-alias>vote_difference</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>victor</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[victor]</local-name>
+            <parent-name>[Pres_Election_Data_2016i.csv]</parent-name>
+            <remote-alias>victor</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteCollation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='DebugRemoteMetadata (compression)'>&quot;heap&quot;</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>4294967292</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (storagewidth)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;str&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Pres_Election_Data_2016i.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATEFIPS</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[STATEFIPS (CC-EST2015-ALLDATA.csv)]</local-name>
+            <parent-name>[CC-EST2015-ALLDATA.csv]</parent-name>
+            <remote-alias>STATEFIPS</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTY</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COUNTY (CC-EST2015-ALLDATA.csv)]</local-name>
+            <parent-name>[CC-EST2015-ALLDATA.csv]</parent-name>
+            <remote-alias>COUNTY</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>TOT_POP</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[TOT_POP]</local-name>
+            <parent-name>[CC-EST2015-ALLDATA.csv]</parent-name>
+            <remote-alias>TOT_POP</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>NHWA</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[NHWA]</local-name>
+            <parent-name>[CC-EST2015-ALLDATA.csv]</parent-name>
+            <remote-alias>NHWA</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[CC-EST2015-ALLDATA.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATEFIPS</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[STATEFIPS (County_Data_2016_health_insurance.csv)]</local-name>
+            <parent-name>[County_Data_2016_health_insurance.csv]</parent-name>
+            <remote-alias>STATEFIPS</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTY</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COUNTY (County_Data_2016_health_insurance.csv)]</local-name>
+            <parent-name>[County_Data_2016_health_insurance.csv]</parent-name>
+            <remote-alias>COUNTY</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>uninsured_rate_2013</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[uninsured_rate_2013]</local-name>
+            <parent-name>[County_Data_2016_health_insurance.csv]</parent-name>
+            <remote-alias>uninsured_rate_2013</remote-alias>
+            <ordinal>12</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>uninsured_rate_2016</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[uninsured_rate_2016]</local-name>
+            <parent-name>[County_Data_2016_health_insurance.csv]</parent-name>
+            <remote-alias>uninsured_rate_2016</remote-alias>
+            <ordinal>13</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>change</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[change]</local-name>
+            <parent-name>[County_Data_2016_health_insurance.csv]</parent-name>
+            <remote-alias>change</remote-alias>
+            <ordinal>14</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[County_Data_2016_health_insurance.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATEFIPS</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[STATEFIPS (county_density.csv)]</local-name>
+            <parent-name>[county_density.csv]</parent-name>
+            <remote-alias>STATEFIPS</remote-alias>
+            <ordinal>15</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTY</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COUNTY (county_density.csv)]</local-name>
+            <parent-name>[county_density.csv]</parent-name>
+            <remote-alias>COUNTY</remote-alias>
+            <ordinal>16</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <approx-count>1</approx-count>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>people_per_sq_mile</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[people_per_sq_mile]</local-name>
+            <parent-name>[county_density.csv]</parent-name>
+            <remote-alias>people_per_sq_mile</remote-alias>
+            <ordinal>17</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[county_density.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATEFIPS</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[STATEFIPS (Education.csv)]</local-name>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias>STATEFIPS</remote-alias>
+            <ordinal>18</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTY</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COUNTY (Education.csv)]</local-name>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias>COUNTY</remote-alias>
+            <ordinal>19</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>year</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[year]</local-name>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias>year</remote-alias>
+            <ordinal>20</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>bachelorsOrMore</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[bachelorsOrMore]</local-name>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias>bachelorsOrMore</remote-alias>
+            <ordinal>21</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>someCollege</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[someCollege]</local-name>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias>someCollege</remote-alias>
+            <ordinal>22</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>lessThanHSD</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[lessThanHSD]</local-name>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias>lessThanHSD</remote-alias>
+            <ordinal>23</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>HSDonly</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[HSDonly]</local-name>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias>HSDonly</remote-alias>
+            <ordinal>24</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Education.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATEFIPS</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[STATEFIPS (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>STATEFIPS</remote-alias>
+            <ordinal>25</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTY</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COUNTY (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>COUNTY</remote-alias>
+            <ordinal>26</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>vote_difference</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[vote_difference (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>vote_difference</remote-alias>
+            <ordinal>27</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>victor</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[victor (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>victor</remote-alias>
+            <ordinal>28</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <attributes>
+              <attribute datatype='string' name='DebugRemoteCollation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='DebugRemoteMetadata (compression)'>&quot;heap&quot;</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>4294967292</attribute>
+              <attribute datatype='integer' name='DebugRemoteMetadata (storagewidth)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;str&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>bachelorsOrMore</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[bachelorsOrMore (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>bachelorsOrMore</remote-alias>
+            <ordinal>29</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>someCollege</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[someCollege (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>someCollege</remote-alias>
+            <ordinal>30</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>lessThanHSD</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[lessThanHSD (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>lessThanHSD</remote-alias>
+            <ordinal>31</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>HSDonly</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[HSDonly (Education_growth.csv)]</local-name>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias>HSDonly</remote-alias>
+            <ordinal>32</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Education_growth.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>STATEFIPS</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[STATEFIPS (Unemployment.csv)]</local-name>
+            <parent-name>[Unemployment.csv]</parent-name>
+            <remote-alias>STATEFIPS</remote-alias>
+            <ordinal>33</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>COUNTY</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[COUNTY (Unemployment.csv)]</local-name>
+            <parent-name>[Unemployment.csv]</parent-name>
+            <remote-alias>COUNTY</remote-alias>
+            <ordinal>34</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;sint64&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Unemployment_rate_2015</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Unemployment_rate_2015]</local-name>
+            <parent-name>[Unemployment.csv]</parent-name>
+            <remote-alias>Unemployment_rate_2015</remote-alias>
+            <ordinal>35</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Median_Household_Income_2014</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Median_Household_Income_2014]</local-name>
+            <parent-name>[Unemployment.csv]</parent-name>
+            <remote-alias>Median_Household_Income_2014</remote-alias>
+            <ordinal>36</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='DebugRemoteMetadata (size)'>8</attribute>
+              <attribute datatype='string' name='DebugRemoteType'>&quot;double&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[Unemployment.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='COUNTY (County Data 2016 health insurance.csv)' datatype='integer' name='[COUNTY (County_Data_2016_health_insurance.csv)]' role='measure' type='quantitative' />
+      <column caption='COUNTY (Education growth.csv)' datatype='integer' name='[COUNTY (Education_growth.csv)]' role='measure' type='quantitative' />
+      <column caption='COUNTY (county density.csv)' datatype='integer' name='[COUNTY (county_density.csv)]' role='measure' type='quantitative' />
+      <column caption='County' datatype='integer' name='[COUNTY]' role='measure' type='quantitative' />
+      <column caption='HSDonly (Education growth.csv)' datatype='real' name='[HSDonly (Education_growth.csv)]' role='measure' type='quantitative' />
+      <column caption='HS Donly' datatype='real' name='[HSDonly]' role='measure' type='quantitative' />
+      <column caption='Median Household Income 2014' datatype='real' name='[Median_Household_Income_2014]' role='measure' type='quantitative' />
+      <column caption='Nhwa' datatype='real' name='[NHWA]' role='measure' type='quantitative' />
+      <column datatype='integer' name='[Number of Records]' role='measure' type='quantitative' user:auto-column='numrec'>
+        <calculation class='tableau' formula='1' />
+      </column>
+      <column caption='Stateabb' datatype='string' name='[STATEABB]' role='dimension' type='nominal' />
+      <column caption='STATEFIPS (County Data 2016 health insurance.csv)' datatype='real' name='[STATEFIPS (County_Data_2016_health_insurance.csv)]' role='measure' type='quantitative' />
+      <column caption='STATEFIPS (Education growth.csv)' datatype='real' name='[STATEFIPS (Education_growth.csv)]' role='measure' type='quantitative' />
+      <column caption='STATEFIPS (county density.csv)' datatype='real' name='[STATEFIPS (county_density.csv)]' role='measure' type='quantitative' />
+      <column caption='Statefips' datatype='integer' name='[STATEFIPS]' role='measure' type='quantitative' />
+      <column caption='Tot Pop' datatype='integer' name='[TOT_POP]' role='measure' type='quantitative' />
+      <column caption='Unemployment rate 2015' datatype='real' name='[Unemployment_rate_2015]' role='measure' type='quantitative' />
+      <column caption='bachelorsOrMore (Education growth.csv)' datatype='real' name='[bachelorsOrMore (Education_growth.csv)]' role='measure' type='quantitative' />
+      <column caption='Bachelors Or More' datatype='real' name='[bachelorsOrMore]' role='measure' type='quantitative' />
+      <column caption='Change' datatype='real' name='[change]' role='measure' type='quantitative' />
+      <column caption='County Name' datatype='string' name='[county_name]' role='dimension' semantic-role='[County].[Name]' type='nominal' />
+      <column caption='lessThanHSD (Education growth.csv)' datatype='real' name='[lessThanHSD (Education_growth.csv)]' role='measure' type='quantitative' />
+      <column caption='Less Than HSD' datatype='real' name='[lessThanHSD]' role='measure' type='quantitative' />
+      <column caption='People Per Sq Mile' datatype='real' name='[people_per_sq_mile]' role='measure' type='quantitative' />
+      <column caption='someCollege (Education growth.csv)' datatype='real' name='[someCollege (Education_growth.csv)]' role='measure' type='quantitative' />
+      <column caption='Some College' datatype='real' name='[someCollege]' role='measure' type='quantitative' />
+      <column caption='Uninsured Rate 2013' datatype='real' name='[uninsured_rate_2013]' role='measure' type='quantitative' />
+      <column caption='Uninsured Rate 2016' datatype='real' name='[uninsured_rate_2016]' role='measure' type='quantitative' />
+      <column caption='victor (Education growth.csv)' datatype='string' name='[victor (Education_growth.csv)]' role='dimension' type='nominal' />
+      <column caption='Victor' datatype='string' name='[victor]' role='dimension' type='nominal' />
+      <column caption='vote difference (Education growth.csv)' datatype='real' name='[vote_difference (Education_growth.csv)]' role='measure' type='quantitative' />
+      <column caption='Vote Difference' datatype='real' name='[vote_difference]' role='measure' type='quantitative' />
+      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+      <layout dim-ordering='alphabetic' dim-percentage='0.321976' measure-ordering='alphabetic' measure-percentage='0.678024' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Sheet 1'>
+      <table>
+        <view>
+          <datasources />
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+    </worksheet>
+  </worksheets>
+  <windows source-height='30'>
+    <window class='worksheet' maximized='true' name='Sheet 1'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='31'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='384' name='Sheet 1' width='384'>
+      iVBORw0KGgoAAAANSUhEUgAAAYAAAAGACAYAAACkx7W/AAAACXBIWXMAAAsTAAALEwEAmpwY
+      AAAFXUlEQVR4nO3VMQEAIAzAMMC/5yFjRxMF/XpnZg4AOW87AIAdBgAQZQAAUQYAEGUAAFEG
+      ABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAA
+      UQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBl
+      AABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYA
+      EGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABR
+      BgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUA
+      AFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQ
+      ZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEG
+      ABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAA
+      UQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBl
+      AABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYA
+      EGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABR
+      BgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUA
+      AFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQ
+      ZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEG
+      ABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAA
+      UQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBl
+      AABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYA
+      EGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABR
+      BgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUA
+      AFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQ
+      ZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEG
+      ABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAA
+      UQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBl
+      AABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEGABBlAABRBgAQZQAAUQYA
+      EGUAAFEGABBlAABRBgAQZQAAUQYAEGUAAFEfFxoG/IiMv0YAAAAASUVORK5CYII=
+    </thumbnail>
+  </thumbnails>
+</workbook>
