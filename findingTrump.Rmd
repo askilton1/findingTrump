@@ -1,5 +1,6 @@
 ---
-title: "Technical Appendix"
+title: "Finding Trump Technical Appendix"
+subtitle: With interactive dot plots!
 author: "Antonio Skilton"
 output:
   html_notebook: 
@@ -27,7 +28,6 @@ election <- read_csv("data/raw/Pres_Election_Data_2016i.csv",
          na = "-", 
          col_types = cols_only(X1 = col_character(),
                                FIPS = col_character(),
-                               ST = col_integer(),
                                X2 = col_character(),
                                Clinton = col_character(),
                                Trump = col_character(),
@@ -35,15 +35,13 @@ election <- read_csv("data/raw/Pres_Election_Data_2016i.csv",
   filter(LSAD_TRANS %in% c("Parish", "County")) %>%
   slice(-1) %>% 
   rename(county_name = X1, 
-         STATEABB = X2,
-         COUNTY = FIPS,
-         STATEFIPS = ST) %>% 
+         STATEABB = X2) %>% 
   mutate_at(3:4, funs(as.numeric(gsub("%", "", .))/100)) %>% 
   na.omit %>% 
-  transmute(STATEFIPS, 
+  transmute(FIPS,
             county_name,
             STATEABB,
-            COUNTY = as.numeric(substr(COUNTY, 3, 5)),
+            COUNTY = as.integer(substr(FIPS, 3, 5)),
             vote_difference = Trump - Clinton,
             victor = ifelse(vote_difference > 0, "Trump", "Clinton")) 
 ```
@@ -84,8 +82,7 @@ density <- read_csv("data/raw/county_density.csv", skip = 1,
          col_types = cols_only(`Target Geo Id` = col_character(),
                                `Density per square mile of land area - Population` = col_double())) %>% 
   filter(nchar(`Target Geo Id`) == 14) %>% 
-  transmute(STATEFIPS = as.numeric(substr(`Target Geo Id`, start = 10, stop = 11)),
-            COUNTY = as.numeric(substr(`Target Geo Id`, start = 12, stop = 14)),
+  transmute(FIPS = substr(`Target Geo Id`, start = 10, stop = 14),
             people_per_sq_mile = `Density per square mile of land area - Population`)
 ```
 
@@ -99,17 +96,16 @@ density %>%
 from [Enroll America](https://www.enrollamerica.org/research-maps/maps/changes-in-uninsured-rates-by-county/):
 ```{r}
 insurance <- read_csv("data/raw/County_Data_2016_health_insurance.csv",
-         col_types = list(county_fips = col_character())) %>% 
+                      col_types = list(county_fips = col_character())) %>% 
   setNames(gsub(pattern = " ", replacement = "_", names(.))) %>% 
-  transmute(STATEFIPS = ifelse(nchar(county_fips) == 5,
-                               as.numeric(substr(county_fips, start = 1, stop = 2)),
-                               as.numeric(substr(county_fips, start = 1, stop = 1))),
-                               COUNTY = as.numeric(substr(county_fips, start = nchar(county_fips) - 2, stop = nchar(county_fips))),
-                               uninsured_rate_2013 = `2013_uninsured_rate` / 100,
-                               uninsured_rate_2016 = `2016_uninsured_rate` / 100,
-                               decrease_from_2013_to_2016 = decrease_from_2013_to_2016 / 100) %>% 
+  transmute(FIPS = ifelse(nchar(county_fips) == 5,
+                          county_fips,
+                          paste0("0", county_fips)),
+            uninsured_rate_2013 = `2013_uninsured_rate` / 100,
+            uninsured_rate_2016 = `2016_uninsured_rate` / 100,
+            decrease_from_2013_to_2016 = decrease_from_2013_to_2016 / 100) %>% 
   rename(change = decrease_from_2013_to_2016) %>% 
-  arrange(STATEFIPS, COUNTY)
+  arrange(FIPS)
 ```
 
 ```{r, echo=F}
@@ -123,14 +119,13 @@ insurance %>%
 from the [USDA](https://www.ers.usda.gov/topics/rural-economy-population/rural-classifications.aspx).
 ```{r}
 econ <- read_csv("data/raw/Unemployment.csv", skip = 6, 
-         col_types = cols_only(FIPS_Code = col_character(),
-                               Unemployment_rate_2015 = col_double(),
-                               Median_Household_Income_2014 = col_number())) %>% 
-  transmute(STATEFIPS = as.numeric(substr(FIPS_Code, 1, 2)),
-            COUNTY = as.numeric(substr(FIPS_Code, 3, 5)),
+                 col_types = cols_only(FIPS_Code = col_character(),
+                                       Unemployment_rate_2015 = col_double(),
+                                       Median_Household_Income_2014 = col_number())) %>% 
+  transmute(FIPS = FIPS_Code,
             Unemployment_rate_2015 = Unemployment_rate_2015 / 100,
-            Median_Household_Income_2014) %>% 
-  filter(COUNTY != 0) 
+            Median_Household_Income_2014) %>%
+  filter(substr(FIPS, start = 5, stop = 5) != 0)
 ```
 ```{r, echo=F}
 econ %>% 
@@ -143,18 +138,18 @@ econ %>%
 from the [Census](https://www.census.gov/popest/data/counties/asrh/2015/CC-EST2015-ALLDATA.html):
 ```{r, message=FALSE, warning=FALSE}
 NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
-         col_types = cols_only(STATE = col_integer(),
-                               COUNTY = col_integer(),
-                               TOT_POP = col_integer(),
-                               AGEGRP = col_integer(),
-                               YEAR = col_integer(),
-                               NHWA_MALE = col_integer(),
-                               NHWA_FEMALE = col_integer()),
-         progress = F) %>% 
+                 col_types = cols_only(STATE = col_character(),
+                                       COUNTY = col_character(),
+                                       TOT_POP = col_integer(),
+                                       AGEGRP = col_integer(),
+                                       YEAR = col_integer(),
+                                       NHWA_MALE = col_integer(),
+                                       NHWA_FEMALE = col_integer()),
+                 progress = F) %>%
+  mutate(FIPS = paste0(STATE,COUNTY)) %>% 
   filter(AGEGRP >= 5,
          YEAR == 8) %>% 
-  rename(STATEFIPS = STATE) %>%
-  group_by(STATEFIPS, COUNTY) %>% 
+  group_by(FIPS) %>% 
   summarise(TOT_POP = sum(TOT_POP),
             NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP))
 ```
@@ -171,26 +166,17 @@ from the [USDA](https://data.ers.usda.gov/reports.aspx?ID=18243):
 education <- read_csv("data/raw/Education.csv", skip = 4) %>%
   slice(-c(1,2)) %>% 
   select(`FIPS Code`, contains("Percent")) %>% 
-  setNames(gsub(pattern = "[[:punct:]]| ", 
-                replacement = "_", names(.))) %>%
-  setNames(gsub(pattern = "High_school_diploma", 
-                replacement = "HSD", names(.), ignore.case = T)) %>%
-  setNames(gsub(pattern = "Some_college_or_associate_s_degree|some_college_", 
-                replacement = "someCollege", names(.), ignore.case = T)) %>%
-  setNames(gsub(pattern = "bachelor_s_degree_or_higher", 
-                replacement = "bachelorsOrMore", names(.), ignore.case = T)) %>%
-  setNames(gsub(pattern = "with_less_than_a_HSD_|less_than_a_HSD_", 
-                replacement = "lessThanHSD", names(.), ignore.case = T)) %>%
-  setNames(gsub(pattern = "percent_of_", 
-                replacement = "", names(.), ignore.case = T)) %>%
-  setNames(gsub(pattern = "___|__", 
-                replacement = "_", names(.))) %>%
-  mutate(STATEFIPS = as.numeric(substr(FIPS_Code, 1, 2)),
-         COUNTY = as.numeric(substr(FIPS_Code, 3, 5))) %>%
-  select(STATEFIPS, COUNTY, -FIPS_Code, 
-         adults_lessThanHSD_1970:adults_with_a_bachelorsOrMore_2010_2014) %>% 
-  gather(key, value, -STATEFIPS, -COUNTY) %>% 
-  transmute(STATEFIPS, COUNTY, key, percent = value / 100,
+  setNames(gsub(pattern = "[[:punct:]]| ", replacement = "_", names(.))) %>%
+  setNames(gsub(pattern = "High_school_diploma", replacement = "HSD", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "Some_college_or_associate_s_degree|some_college_", replacement = "someCollege", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "bachelor_s_degree_or_higher", replacement = "bachelorsOrMore", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "with_less_than_a_HSD_|less_than_a_HSD_", replacement = "lessThanHSD", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "percent_of_", replacement = "", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "___|__", replacement = "_", names(.))) %>%
+  rename(FIPS = FIPS_Code) %>% 
+  select(FIPS, adults_lessThanHSD_1970:adults_with_a_bachelorsOrMore_2010_2014) %>% 
+  gather(key, value, -FIPS) %>% 
+  transmute(FIPS, key, percent = value / 100,
             year = gsub('\\D','\\1', key),
             year = as.numeric(substr(year, nchar(year) - 3, nchar(year))),
             year = ifelse(year == 2014, 2010, year)) %>% 
@@ -199,8 +185,8 @@ education <- read_csv("data/raw/Education.csv", skip = 4) %>%
   unite(bachelorsOrMore, contains("bachelorsOrMore"), contains("four_years_of_college_or_higher")) %>% 
   unite(lessThanHSD, contains("lessThanHSD")) %>% 
   unite(HSDonly, contains("HSD_only")) %>% 
-  mutate_at(vars(bachelorsOrMore:HSDonly), funs(as.numeric(gsub("NA|_", "", .)))) %>% 
-  filter(COUNTY != 0)
+  mutate_at(vars(bachelorsOrMore:HSDonly), funs(as.numeric(gsub("NA|_", "", .)))) %>%
+  na.omit
 ```
 
 ```{r, echo=F}
@@ -210,8 +196,8 @@ education
 Using this time series data we can calculate growth rates. This is convenient because it returns us to a countly level dataset where each row represents a column, as opposed to a column-decade. Note that the growth rates are not annual growth rates but represent change over the course of 40 years.
 ```{r, message=FALSE, warning=FALSE}
 education_growth <- read_csv("data/clean/Education.csv") %>% 
-  group_by(STATEFIPS, COUNTY) %>% 
-  summarise_at(vars(bachelorsOrMore:HSDonly), function(col) last(col) - first(col))
+  group_by(FIPS) %>% 
+  summarise_at(vars(bachelorsOrMore:HSDonly), function(col) last(col) - first(col)) 
 ```
 
 ```{r, echo=F}
@@ -222,8 +208,7 @@ education_growth
 education_growth %>% 
   gather(variable, growth_rate, bachelorsOrMore:HSDonly) %>% 
   right_join(gather(education, variable, value, bachelorsOrMore:HSDonly)) %>% 
-  unite(state_county, STATEFIPS, COUNTY) %>% 
-  ggplot(aes(x = year, y = value, color = growth_rate, group = state_county)) +
+  ggplot(aes(x = year, y = value, color = growth_rate, group = FIPS)) +
     geom_line(alpha = 1/10) +
     theme(legend.position = "none") +
     facet_wrap(~variable) + 
@@ -239,6 +224,7 @@ education_growth %>%
 Growth rates in each of the four variables in the education data have an independent effect on a vote for trump, as shown in the regression results below.
 ```{r, message=FALSE, warning=FALSE}
 read_csv("data/clean/Education_growth.csv") %>% 
+  inner_join(election) %>% 
   lm(vote_difference ~ bachelorsOrMore + someCollege + lessThanHSD + HSDonly, data = .) %>% 
   summary
 ```
@@ -273,7 +259,9 @@ joined_data %>%
 The Random Forest model produces a list of variables in the order of importance in determining voter_difference:
 ```{r, message=FALSE, warning=FALSE}
 library(randomForest)
-data.rf <- randomForest(x = select(joined_data, -vote_difference, -victor),
+rf_data_x <- select(joined_data, -vote_difference, -victor, -FIPS, -county_name) %>% 
+  mutate_if(is.character, as.factor)
+data.rf <- randomForest(x = rf_data_x,
                         y = joined_data$vote_difference,
                         importance = T)
 imp <- importance(data.rf, 1)[order(importance(data.rf, 1), decreasing = T),] 
@@ -287,8 +275,10 @@ library(antonioSkiltonTools)
 library(forcats)
 
 joined_data %>% 
+  select(-FIPS, -county_name, -COUNTY, -STATEABB) %>% 
   rankedCorrelations() %>% 
-  filter(Vars1 == "vote_difference" | Vars2 == "vote_difference") %>% 
+  filter(Vars1 == "vote_difference" | Vars2 == "vote_difference",
+         !grepl("victor", Vars1), !grepl("victor", Vars2)) %>% 
   unite(Vars, Vars1, Vars2, sep = " & ") %>% 
   arrange(abs(correlation)) %>% 
   mutate(Vars = fct_inorder(Vars)) %>% 
@@ -303,15 +293,35 @@ joined_data %>%
          x = "Variable pairs")
 ```
 
+```{r, fig.height=5}
+joined_data %>% 
+  select(-FIPS, -county_name, -COUNTY, -STATEABB) %>%  
+  rankedCorrelations() %>% 
+  filter(!grepl("victor", Vars1), !grepl("victor", Vars2)) %>% 
+  unite(Vars, Vars1, Vars2, sep = " & ") %>% 
+  arrange(abs(correlation)) %>% 
+  mutate(Vars = fct_inorder(Vars)) %>%
+  slice(38:78) %>% 
+  ggplot(aes(x = Vars, y = correlation)) +
+    geom_bar(stat = "identity") + 
+    coord_flip() + 
+    theme_minimal() +
+    scale_y_continuous(labels = scales::percent, limits = c(-1,1)) +
+    labs(title = "Ranked Correlations",
+         y = "Degree of correlation",
+         x = "Variable pairs")
+```
+
 To detect multicolinearity, we show correlations between independent variables.
-```{r, fig.height=10}
+```{r, fig.height=5, echo=F}
 joined_data %>% 
+  select(-FIPS, -county_name, -COUNTY, -STATEABB) %>%  
   rankedCorrelations() %>% 
-  filter(Vars1 != "vote_difference" & Vars2 != "vote_difference") %>% 
+  filter(!grepl("victor", Vars1), !grepl("victor", Vars2)) %>%  
   unite(Vars, Vars1, Vars2, sep = " & ") %>% 
   arrange(abs(correlation)) %>% 
   mutate(Vars = fct_inorder(Vars)) %>%
-  slice(54:107) %>% 
+  slice(1:37) %>% 
   ggplot(aes(x = Vars, y = correlation)) +
     geom_bar(stat = "identity") + 
     coord_flip() + 
@@ -321,23 +331,8 @@ joined_data %>%
          y = "Degree of correlation",
          x = "Variable pairs")
 ```
-```{r, fig.height=10, echo=F}
-joined_data %>% 
-  rankedCorrelations() %>% 
-  filter(Vars1 != "vote_difference" & Vars2 != "vote_difference") %>% 
-  unite(Vars, Vars1, Vars2, sep = " & ") %>% 
-  arrange(abs(correlation)) %>% 
-  mutate(Vars = fct_inorder(Vars)) %>%
-  slice(1:53) %>% 
-  ggplot(aes(x = Vars, y = correlation)) +
-    geom_bar(stat = "identity") + 
-    coord_flip() + 
-    theme_minimal() +
-    scale_y_continuous(labels = scales::percent, limits = c(-1,1)) +
-    labs(title = "Ranked Correlations",
-         y = "Degree of correlation",
-         x = "Variable pairs")
-```
+
+
 #Charts
 ```{r, fig.width=10}
 p <- joined_data %>% 
