@@ -2,9 +2,9 @@
 title: "Finding Trump Technical Appendix"
 subtitle: With interactive dot plots!
 author: "Antonio Skilton"
-output: 
-  md_document:
-    variant: markdown_github
+output:  
+  html_notebook: 
+    toc: yes
 ---
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=8, fig.path='Figs/',
