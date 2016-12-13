@@ -1,0 +1,196 @@
+---
+title: "Finding Trump Storytelling Document"
+author: "Antonio Skilton"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=F,message=F,warning=F)
+```
+
+```{r}
+library(tidyverse, quietly=T)
+```
+```{r, message=F, warning=F}
+election <- read_csv("data/raw/Pres_Election_Data_2016i.csv", 
+         na = "-", 
+         col_types = cols_only(X1 = col_character(),
+                               FIPS = col_character(),
+                               X2 = col_character(),
+                               Clinton = col_character(),
+                               Trump = col_character(),
+                               LSAD_TRANS = col_character())) %>% 
+  filter(LSAD_TRANS %in% c("Parish", "County")) %>%
+  slice(-1) %>% 
+  rename(county_name = X1, 
+         STATEABB = X2) %>% 
+  mutate_at(3:4, funs(as.numeric(gsub("%", "", .))/100)) %>% 
+  na.omit %>% 
+  transmute(FIPS,
+            county_name,
+            STATEABB,
+            COUNTY = as.integer(substr(FIPS, 3, 5)),
+            vote_difference = Trump - Clinton,
+            victor = ifelse(vote_difference > 0, "Trump", "Clinton")) 
+```
+```{r, message=FALSE, warning=FALSE}
+NHWA <- read_csv("data/raw/CC-EST2015-ALLDATA.csv",
+                 col_types = cols_only(STATE = col_character(),
+                                       COUNTY = col_character(),
+                                       TOT_POP = col_integer(),
+                                       AGEGRP = col_integer(),
+                                       YEAR = col_integer(),
+                                       NHWA_MALE = col_integer(),
+                                       NHWA_FEMALE = col_integer()),
+                 progress = F) %>%
+  mutate(FIPS = paste0(STATE,COUNTY)) %>% 
+  filter(AGEGRP >= 5,
+         YEAR == 8) %>% 
+  group_by(FIPS) %>% 
+  summarise(TOT_POP = sum(TOT_POP),
+            NHWA = sum(NHWA_MALE + NHWA_FEMALE) / sum(TOT_POP))
+```
+```{r, message=FALSE, warning=FALSE}
+education <- read_csv("data/raw/Education.csv", skip = 4) %>%
+  slice(-c(1,2)) %>% 
+  select(`FIPS Code`, contains("Percent")) %>% 
+  setNames(gsub(pattern = "[[:punct:]]| ", replacement = "_", names(.))) %>%
+  setNames(gsub(pattern = "High_school_diploma", replacement = "HSD", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "Some_college_or_associate_s_degree|some_college_", replacement = "someCollege", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "bachelor_s_degree_or_higher", replacement = "bachelorsOrMore", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "with_less_than_a_HSD_|less_than_a_HSD_", replacement = "lessThanHSD", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "percent_of_", replacement = "", names(.), ignore.case = T)) %>%
+  setNames(gsub(pattern = "___|__", replacement = "_", names(.))) %>%
+  rename(FIPS = FIPS_Code) %>% 
+  select(FIPS, adults_lessThanHSD_1970:adults_with_a_bachelorsOrMore_2010_2014) %>% 
+  gather(key, value, -FIPS) %>% 
+  transmute(FIPS, key, percent = value / 100,
+            year = gsub('\\D','\\1', key),
+            year = as.numeric(substr(year, nchar(year) - 3, nchar(year))),
+            year = ifelse(year == 2014, 2010, year)) %>% 
+  spread(key, percent, drop = FALSE) %>% 
+  unite(someCollege, contains("someCollege")) %>% 
+  unite(bachelorsOrMore, contains("bachelorsOrMore"), contains("four_years_of_college_or_higher")) %>% 
+  unite(lessThanHSD, contains("lessThanHSD")) %>% 
+  unite(HSDonly, contains("HSD_only")) %>% 
+  mutate_at(vars(bachelorsOrMore:HSDonly), funs(as.numeric(gsub("NA|_", "", .)))) %>%
+  na.omit %>% 
+  filter(year == 2010)
+```
+```{r}
+econ <- read_csv("data/raw/Unemployment.csv", skip = 6, 
+                 col_types = cols_only(FIPS_Code = col_character(),
+                                       Unemployment_rate_2015 = col_double(),
+                                       Median_Household_Income_2014 = col_number())) %>% 
+  transmute(FIPS = FIPS_Code,
+            Unemployment_rate_2015 = Unemployment_rate_2015 / 100,
+            Median_Household_Income_2014) %>%
+  filter(substr(FIPS, start = 5, stop = 5) != 0)
+```
+```{r, message=FALSE, warning=FALSE}
+joined_data <- election %>% 
+  inner_join(education) %>% 
+  inner_join(econ) %>% 
+  inner_join(NHWA)
+```
+##Introduction	
+
+The 2016 Presidential Election laid bare the extent to which I was uninformed about the makeup of the American electorate. As the results poured in over the course of the evening of November 8th, the surprises kept piling up. First came Florida, where exit polls had showed a surge of Latinos who were predicted to decisively tilt the state to Clinton, ensuring a quick victory. Next was Virginia, which showed an unexpectedly tight race (though Hillary Clinton still won that state in the end). These early surprises highlighted the remaining political power of White voters, who despite making up a record low percentage of the vote (70%) broke for the GOP in record numbers. The trend continued in all swing states except Nevada, clinching the electoral votes required for the nomination.
+	
+Hillary Clinton was widely seen as the inevitable successor to President Barack Obama. Given the election outcome and the staggering amount of data we collect about ourselves, it is odd that we were so wrong. We have extensive data regarding race, income, age, health status, sex, and more. Pollsters constantly surveyed voters and had seasoned models for predicting voter turnout. Before Trump’s election, some poll aggregators had cautioned pundits who underestimated the uncertainty of predictions of a Clinton win by citing the fact that polling errors regularly match the margin with which Clinton was thought to be leading Trump.
+	
+However, even the obsessive consumer of American politics (such as myself) was left with the impression that there was no plausible argument to be made that a Trump victory was possible. Although part of that mistaken assessment of mine is attributable to political bias, it could not explain all. The reality is that despite my undergraduate degrees in both sociology and economics, I felt demographically illiterate. I was aware that there were stark differences between people in urban and rural areas, but had previously attributed the major demographic divide in America to race. Although race clearly played a role in this election, it was clear that something else was at play as well. The research question behind this project, in sum, is as follows: What demographic realities in the United States exist that should have a Trump victory appear possible? To be clear, I am not attempting to explain how Donald Trump won the election, as I have no intention of delving into Electoral College math or voter propensity models.
+
+---
+
+##The Research
+
+To answer my research question I had to pick a unit of analysis. I settled on counties for two reasons: 
+
+ 1. Counties are a small enough unit of analysis that basic demographic statistics are likely to be accurate across most residents. This is not true of states or larger geographic bodies. 
+ 2. There are extensive statistics describing counties. This is not true of towns or cities, whose boundaries are more likely to change, and for which statistics are not publicly available to the same extent. 
+
+Although I had initially chosen to focus on race, education level, income level, sex, and age, using counties as my unit of analysis made only race and education level possible. This is true because while people tend to live near those of the same race, education level, and income level, the same is not true for sex and age. 
+
+####Race
+
+As stated above and shown in the chart below, the vast majority of counties in the United States are majority white. While it may be self evident that the United States is majority White, county level analysis truly demonstrates the extent to which this is true.
+
+```{r}
+joined_data %>% 
+  mutate(`Racial Majority` = ifelse(NHWA >= .50, "majority White", "majority non-White")) %>% 
+ggplot(aes(x = NHWA, fill = `Racial Majority`)) +
+  geom_histogram(bins = 45) +
+  scale_x_continuous(labels = scales::percent) +
+  labs(title = "Distribution of Percent White among Counties",
+       subtitle = "91% of counties are majority white",
+       x = "percent of county that is non-Hispanic White") +
+  theme_minimal()
+```
+
+```{r}
+joined_data %>% 
+  mutate(`Racial Majority` = ifelse(NHWA >= .50, "majority White", "majority non-White")) %>% 
+ggplot(aes(x = NHWA, y = vote_difference, color = `Racial Majority`)) +
+  geom_point(alpha = 0.15) +
+  geom_hline(yintercept = 0) +
+  scale_x_continuous(labels = scales::percent) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() +
+  labs(title = "Racial Composition of County by Election Result",
+       subtitle = "Counties where less than half the population was white were less likely to vote Trump.",
+       x = "percent of county that is non-Hispanic White",
+       y = "Trump % of vote - Clinton % of vote")
+```
+
+####Education
+
+While the division between education levels might not seem as stark as those defined by race, they nevertheless have a significant relationship with election results.
+
+```{r}
+joined_data %>% 
+  gather(`Education Level`, `percent of county with education level`, bachelorsOrMore, lessThanHSD) %>% 
+ggplot(aes(x = `percent of county with education level`, y = vote_difference)) +
+  # geom_point(alpha = 0.15, aes(color = `Education Level`)) +
+  geom_smooth(aes(color = `Education Level`)) +
+  scale_x_continuous(labels = scales::percent, limits = c(0,0.3)) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() +
+  labs(title = "Education Level of County by Election Result",
+       subtitle = "Bachelors degrees are associated with a lower margin of victory for Trump. A lack of a high school diploma is associated with the opposite",
+       x = "percent of county with specified education level",
+       y = "Trump % of vote - Clinton % of vote")
+```
+
+####Income 
+Income is likely the most interesting of the three demographics explored. The counties with the poorest and richest median income levels were more likely to vote for Trump. 
+
+```{r}
+ggplot(joined_data, aes(x = Median_Household_Income_2014/1000, y = vote_difference)) +
+  geom_smooth() +
+  scale_x_continuous(labels = scales::dollar) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() + 
+  labs(title = "Median Household Income and Vote Difference",
+       x = "Median Household Income (in thousands)",
+       y = "Trump % of vote - Clinton % of vote")
+```
+
+####Income and Race
+It is necessary to view race and income together to get the necessary context. The chart below is identical to the one above except for that the counties are divided up by racial composition. The purple line represents counties where whites make up more than 74.8% of the population. Among these counties, Trump does best among the poorest. This relationship is not at all evident in counties where Whites make up less than 27.1% of the population, represnted by the orange line. If anything, the relationship is reversed.
+```{r}
+joined_data %>% 
+  mutate(`Percent White` = cut_interval(NHWA, 4)) %>% 
+ggplot(aes(x = Median_Household_Income_2014/1000, y = vote_difference, color = `Percent White`)) +
+  geom_smooth() +
+  scale_x_continuous(labels = scales::dollar) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() + 
+  labs(title = "Median Household Income and Vote Difference by Race",
+       x = "Median Household Income (in thousands)",
+       y = "Trump % of vote - Clinton % of vote")
+```
+
+---
+##Conclusion
+Illustrating these relationships reveals interesting demographic realities about people living in the United States, and explains some of the reasons why some counties will vote differently than others. This research demonstrates that demographic characteristics are strong predictors of political leaning. I am satisfied that I have answered my research question and can now point to education, race, and income to explain the 2016 presidential election.
